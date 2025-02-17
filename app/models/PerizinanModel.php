@@ -171,4 +171,22 @@ class PerizinanModel {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    // Cek status perizinan berdasarkan ID
+    public function getStatus($id)
+    {
+        $query = "SELECT status FROM perizinan WHERE id = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    // Hapus perizinan jika status belum Approved atau Rejected
+    public function delete($id)
+    {
+        $query = "DELETE FROM perizinan WHERE id = ?";
+        $stmt = $this->conn->prepare($query);
+        return $stmt->execute([$id]);
+    }
+
 }

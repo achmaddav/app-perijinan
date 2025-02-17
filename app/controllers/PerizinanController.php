@@ -75,5 +75,33 @@ class PerizinanController {
 
         require_once '../app/views/pengaju/riwayat_perizinan.php';
     }
+
+    public function hapusPerizinan()
+    {
+        if (!isset($_GET['id'])) {
+            header("Location: index.php?page=riwayat_perizinan&errorMessage=ID tidak valid.");
+            exit;
+        }
+
+        $id = $_GET['id'];
+        $status = $this->model->getStatus($id);
+
+        if (!$status) {
+            header("Location: index.php?page=riwayat_perizinan&errorMessage=Data tidak ditemukan!");
+            exit;
+        }
+
+        if ($status['status'] === 'Approved' || $status['status'] === 'Rejected') {
+            header("Location: index.php?page=riwayat_perizinan&errorMessage=Data tidak bisa dihapus karena status sudah " . $status['status']);
+            exit;
+        }
+
+        if ($this->model->delete($id)) {
+            header("Location: index.php?page=riwayat_perizinan&successMessage=Data berhasil dihapus!");
+        } else {
+            header("Location: index.php?page=riwayat_perizinan&errorMessage=Gagal menghapus data.");
+        }
+        exit;
+    }
 }
 ?>

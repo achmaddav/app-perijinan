@@ -7,7 +7,7 @@
     <div class="content-wrapper">
         <section class="content">
             <div class="container-fluid">
-                <h2 class="text-center text-primary mb-4">Daftar Perizinan</h2>
+                <h2 class="text-center text-primary py-3">Daftar Perizinan</h2>
 
                 <!-- Notifikasi -->
                 <?php if (isset($_SESSION['success'])): ?>
@@ -30,7 +30,7 @@
                 <div class="card shadow-lg border-0 rounded-3">
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table id="daftarPerizinanTable" class="table table-hover table-bordered align-middle text-center">
+                            <table id="data-table-perizinan" class="table table-hover table-bordered align-middle text-center">
                                 <thead class="table-primary">
                                     <tr>
                                         <th>No</th>
@@ -95,8 +95,6 @@
     </div>
 </div>
 
-<?php include '../app/views/layouts/footer.php'; ?>
-
 <style>
     /* Hover dan Animasi */
     .table-hover tbody tr:hover {
@@ -124,3 +122,7 @@
         to { opacity: 0; transform: translateY(-10px); }
     }
 </style>
+
+<?php include '../app/views/layouts/footer.php'; ?>
+
+

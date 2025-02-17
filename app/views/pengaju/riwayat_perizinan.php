@@ -8,7 +8,7 @@
     <div class="content-wrapper">
         <div class="content-header">
             <div class="container-fluid">
-                <h2 class="text-center my-4 text-primary">Riwayat Perizinan</h2>
+                <h2 class="text-center py-3 text-primary">Riwayat Perizinan</h2>
 
                 <!-- Notifikasi -->
                 <?php if ($successMessage): ?>
@@ -28,14 +28,14 @@
                 <div class="card shadow-lg border-0 rounded-3">
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table id="riwayatTable" class="table table-hover table-bordered align-middle text-center">
+                            <table id="data-table-perizinan" class="table table-hover table-bordered align-middle text-center">
                                 <thead class="table-primary">
                                     <tr>
                                         <th>No</th>
                                         <th>Alasan</th>
                                         <th>Status</th>
                                         <th>Tanggal Pengajuan</th>
-                                        <!-- <th>Aksi</th> -->
+                                        <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -55,13 +55,22 @@
                                                     <span class="<?= $statusClass; ?>"><?= htmlspecialchars($izin['status']); ?></span>
                                                 </td>
                                                 <td><?= htmlspecialchars($izin['created_at']); ?></td>
-                                                <!-- <td>
-                                                    <a href="index.php?page=hapus_perizinan&id=<?= $izin['id']; ?>" 
-                                                       class="btn btn-sm btn-danger shadow-sm rounded-3" 
-                                                       onclick="return confirm('Apakah Anda yakin ingin menghapus?')">
-                                                        <i class="fas fa-trash"></i> Hapus
-                                                    </a>
-                                                </td> -->
+                                                <td>
+                                                    <?php if ($izin['status'] === 'Approved' || $izin['status'] === 'Rejected'): ?>
+                                                        <button class="btn btn-sm btn-secondary shadow-sm rounded-3"
+                                                                onclick="showCannotDeleteAlert('<?= $izin['status']; ?>')">
+                                                            <i class="fas fa-trash"></i> Hapus
+                                                        </button>
+                                                    <?php else: ?>
+                                                        <button class="btn btn-sm btn-danger shadow-sm rounded-3"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#modalKonfirmasi"
+                                                                data-id="<?= $izin['id']; ?>"
+                                                                data-alasan="<?= htmlspecialchars($izin['alasan']); ?>">
+                                                            <i class="fas fa-trash"></i> Hapus
+                                                        </button>
+                                                    <?php endif; ?>
+                                                </td>
                                             </tr>
                                         <?php endforeach; ?>
                                     <?php else: ?>
@@ -82,10 +91,29 @@
             </div>
         </div>
     </div>
-
 </div>
 
-<?php include '../app/views/layouts/footer.php'; ?>
+<!-- Modal Konfirmasi Hapus -->
+<div class="modal fade" id="modalKonfirmasi" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger" id="modalLabel"><i class="fas fa-exclamation-triangle"></i> Konfirmasi Hapus</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Apakah Anda yakin ingin menghapus perizinan dengan alasan:</p>
+                <p class="fw-bold" id="alasanPerizinan"></p>
+                <p class="text-muted">Tindakan ini tidak dapat dibatalkan!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <a href="#" id="btnHapus" class="btn btn-danger">Ya, Hapus</a>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <style>
     .table-hover tbody tr:hover {
@@ -113,3 +141,7 @@
         to { opacity: 0; transform: translateY(-10px); }
     }
 </style>
+
+<?php include '../app/views/layouts/footer.php'; ?>
+
+

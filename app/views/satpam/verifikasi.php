@@ -12,7 +12,7 @@ $izinList = $perizinanModel->getApprovedRequests();
     <div class="content-wrapper">
         <section class="content">
             <div class="container-fluid">
-                <h2 class="text-center text-primary mb-4">Daftar Perizinan</h2>
+                <h2 class="text-center text-primary py-3">Daftar Perizinan</h2>
 
                 <!-- Notifikasi -->
                 <?php if (isset($_SESSION['success'])): ?>
@@ -35,7 +35,7 @@ $izinList = $perizinanModel->getApprovedRequests();
                 <div class="card shadow-lg border-0 rounded-3">
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table id="daftarPerizinanTable" class="table table-hover table-bordered align-middle text-center">
+                            <table id="data-table-perizinan" class="table table-hover table-bordered align-middle text-center">
                                 <thead class="table-primary">
                                     <tr>
                                         <th>No</th>
@@ -60,8 +60,8 @@ $izinList = $perizinanModel->getApprovedRequests();
                                                         $status = htmlspecialchars($izin['status']);
                                                         $badgeClass = match ($status) {
                                                             'Disetujui' => 'badge bg-success',
-                                                            'Ditolak' => 'badge bg-danger',
-                                                            default => 'badge bg-warning text-dark',
+                                                            'Ditolak'   => 'badge bg-danger',
+                                                            default     => 'badge bg-warning text-dark',
                                                         };
                                                     ?>
                                                     <span class="<?= $badgeClass; ?>"><?= $status; ?></span>
@@ -110,31 +110,28 @@ $izinList = $perizinanModel->getApprovedRequests();
     </div>
 </div>
 
-<?php include '../app/views/layouts/footer.php'; ?>
-
+<!-- Custom Styles -->
 <style>
     .table-hover tbody tr:hover {
         background-color: #f8f9fa;
         transition: all 0.3s ease;
     }
-
     .btn-warning:hover, .btn-secondary:hover, .btn-outline-primary:hover {
         transform: translateY(-3px);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         transition: all 0.3s ease;
     }
-
     .alert {
         animation: fadeIn 0.5s, fadeOut 0.5s 3s;
     }
-
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(-10px); }
         to { opacity: 1; transform: translateY(0); }
     }
-
     @keyframes fadeOut {
         from { opacity: 1; transform: translateY(0); }
         to { opacity: 0; transform: translateY(-10px); }
     }
 </style>
+
+<?php include '../app/views/layouts/footer.php'; ?>

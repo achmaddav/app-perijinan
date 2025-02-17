@@ -78,6 +78,12 @@ function route($conn) {
             $controller->riwayatPerizinan();
             break;
 
+        case 'hapus_perizinan':
+            require_once '../app/controllers/PerizinanController.php';
+            $controller = new PerizinanController($conn);
+            $controller->hapusPerizinan();
+            break;
+
         case 'daftar_perizinan':
             require_once '../app/controllers/AtasanController.php';
             $controller = new AtasanController($conn);

@@ -93,8 +93,6 @@
 
 </div>
 
-<?php include '../app/views/layouts/footer.php'; ?>
-
 <style>
     .card {
         transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -113,4 +111,8 @@
         color: #fff;
     }
 </style>
+
+<?php include '../app/views/layouts/footer.php'; ?>
+
+
 

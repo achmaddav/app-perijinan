@@ -10,7 +10,7 @@ require_once '../config/database.php';
     <div class="content-wrapper">
         <section class="content">
             <div class="container-fluid">
-                <h2 class="text-center text-primary mb-4">Laporan Perizinan</h2>
+                <h2 class="text-center text-primary py-3">Laporan Perizinan</h2>
 
                 <!-- Form Filter -->
                 <div class="card shadow-sm border-0 mb-4">
@@ -111,8 +111,6 @@ require_once '../config/database.php';
     </div>
 </div>
 
-<?php include '../app/views/layouts/footer.php'; ?>
-
 <style>
     /* Efek Hover & Animasi */
     .table-hover tbody tr:hover {
@@ -137,3 +135,7 @@ require_once '../config/database.php';
         transition: all 0.3s ease;
     }
 </style>
+
+<?php include '../app/views/layouts/footer.php'; ?>
+
+

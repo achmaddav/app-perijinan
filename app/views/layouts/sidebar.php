@@ -6,7 +6,7 @@ if (session_status() == PHP_SESSION_NONE) {
 
 <!-- Sidebar -->
 <aside class="main-sidebar bg-white shadow-sm rounded-4">
-    <a href="#" class="brand-link text-decoration-none text-center py-3 d-block border-bottom">
+    <a href="#" class="brand-link text-decoration-none text-center d-block border-bottom">
         <span class="brand-text font-weight-bold text-primary">Aplikasi Perizinan</span>
     </a>
     <div class="sidebar">
