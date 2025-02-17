@@ -1,91 +1,6 @@
 <?php 
 include '../app/views/layouts/header.php'; 
 require_once '../config/database.php';
-
-// Ambil instance database dan koneksi PDO
-$database = Database::getInstance();
-$pdo = $database->getConnection();
-
-// Konfigurasi Paginasi
-$limit = 10;
-$page = isset($_GET['page_no']) ? max(1, (int)$_GET['page_no']) : 1;
-$offset = max(0, ($page - 1) * $limit);
-
-// Filter Data Berdasarkan Bulan yang Dipilih
-$month_filter = isset($_GET['month']) ? $_GET['month'] : date('Y-m');
-$status_filter = $_GET['status'] ?? '';
-$pemohon_filter = $_GET['pemohon'] ?? '';
-
-// Query Data dengan JOIN ke tabel users
-$query = "SELECT p.id, u.nama AS nama_pemohon, p.alasan, p.status, 
-                 p.tanggal_rencana_keluar, p.durasi_keluar, 
-                 a.nama AS nama_atasan, p.created_at 
-          FROM perizinan p
-          JOIN users u ON p.user_id = u.id
-          LEFT JOIN users a ON p.approved_by = a.id
-          WHERE DATE_FORMAT(p.created_at, '%Y-%m') = DATE_FORMAT(CURRENT_DATE(), '%Y-%m')
-          AND p.approved_by = :user_id";
-
-$params = [':user_id' => $user_id];
-
-if (!empty($status_filter)) {
-    $query .= " AND p.status = :status";
-    $params[':status'] = $status_filter;
-}
-
-if (!empty($pemohon_filter)) {
-    $query .= " AND u.nama LIKE :pemohon";
-    $params[':pemohon'] = "%$pemohon_filter%";
-}
-
-$query .= " ORDER BY p.created_at DESC LIMIT :limit OFFSET :offset";
-
-$stmt = $pdo->prepare($query);
-$stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
-$stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-
-if (!empty($status_filter)) {
-    $stmt->bindValue(':status', $status_filter, PDO::PARAM_STR);
-}
-
-if (!empty($pemohon_filter)) {
-    $stmt->bindValue(':pemohon', "%$pemohon_filter%", PDO::PARAM_STR);
-}
-
-$stmt->execute();
-$data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Hitung Total Data untuk Paginasi
-$count_query = "SELECT COUNT(*) 
-                FROM perizinan p
-                JOIN users u ON p.user_id = u.id
-                LEFT JOIN users a ON p.approved_by = a.id
-                WHERE DATE_FORMAT(p.created_at, '%Y-%m') = DATE_FORMAT(CURRENT_DATE(), '%Y-%m')
-                AND p.approved_by = :user_id";
-
-if (!empty($status_filter)) {
-    $count_query .= " AND p.status = :status";
-}
-
-if (!empty($pemohon_filter)) {
-    $count_query .= " AND u.nama LIKE :pemohon";
-}
-
-$count_stmt = $pdo->prepare($count_query);
-$count_stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
-
-if (!empty($status_filter)) {
-    $count_stmt->bindValue(':status', $status_filter, PDO::PARAM_STR);
-}
-
-if (!empty($pemohon_filter)) {
-    $count_stmt->bindValue(':pemohon', "%$pemohon_filter%", PDO::PARAM_STR);
-}
-
-$count_stmt->execute();
-$total_rows = $count_stmt->fetchColumn();
-$total_pages = ceil($total_rows / $limit);
 ?>
 
 <div class="wrapper">
@@ -166,7 +81,7 @@ $total_pages = ceil($total_rows / $limit);
                 <!-- Pagination -->
                 <nav>
                     <ul class="pagination">
-                        <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                        <?php for ($i = 1; $i <= $totalPages; $i++): ?>
                             <li class="page-item <?= ($i == $page) ? 'active' : '' ?>">
                                 <a class="page-link" href="?page=laporan_perizinan&page_no=<?= $i ?>&month=<?= htmlspecialchars($month_filter) ?>&status=<?= urlencode($status_filter) ?>&pemohon=<?= urlencode($pemohon_filter) ?>">
                                     <?= $i ?>

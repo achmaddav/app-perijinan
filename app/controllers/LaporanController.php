@@ -10,23 +10,34 @@ class LaporanController {
     }
 
     public function laporanPerizinan() {
+        // Tentukan limit per halaman
         $limit = 10;
-        $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
-        $offset = max(0, ($page - 1) * $limit);
-
-        // Ambil data laporan perizinan berdasarkan pagination dan bulan saat ini
-        $data = $this->model->getLaporanPerizinan($offset, $limit);
-        $totalData = $this->model->countTotalLaporan();
+        // Ambil nomor halaman dengan validasi menggunakan filter_input
+        $page = filter_input(INPUT_GET, 'page_no', FILTER_VALIDATE_INT, [
+            'options' => ['default' => 1, 'min_range' => 1]
+        ]);
+        $offset = ($page - 1) * $limit;
+        
+        // Ambil filter dari GET dan sanitasi input-nya
+        $month_filter = filter_input(INPUT_GET, 'month', FILTER_SANITIZE_STRING) ?: date('Y-m');
+        $status_filter = filter_input(INPUT_GET, 'status', FILTER_SANITIZE_STRING) ?: '';
+        $pemohon_filter = filter_input(INPUT_GET, 'pemohon', FILTER_SANITIZE_STRING) ?: '';
+        
+        // Ambil data laporan perizinan berdasarkan filter dan pagination
+        $data = $this->model->getLaporanPerizinan($month_filter, $status_filter, $pemohon_filter, $limit, $offset);
+        $totalData = $this->model->countTotalLaporan($month_filter, $status_filter, $pemohon_filter);
         $totalPages = ceil($totalData / $limit);
-
-        // Pastikan halaman tidak melebihi batas total halaman yang tersedia
+        
+        // Pastikan halaman tidak melebihi batas total halaman
         if ($page > $totalPages && $totalPages > 0) {
             $page = $totalPages;
             $offset = ($page - 1) * $limit;
-            $data = $this->model->getLaporanPerizinan($offset, $limit);
+            $data = $this->model->getLaporanPerizinan($month_filter, $status_filter, $pemohon_filter, $limit, $offset);
         }
-
+        
+        // Sertakan view dan kirim variabel yang diperlukan
         require_once '../app/views/atasan/laporan_perizinan.php';
     }
 }
 ?>
+
