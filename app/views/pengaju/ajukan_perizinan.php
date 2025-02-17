@@ -4,68 +4,65 @@
     <?php include '../app/views/layouts/navbar.php'; ?>
     <?php include '../app/views/layouts/sidebar.php'; ?>
 
-    <div class="content-wrapper my-5">
-        <!-- <div class="content-header">
+    <div class="content-wrapper">
+        <div class="content-header">
             <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1 class="m-0"><i class="fa fa-edit"></i> Ajukan Perizinan</h1>
-                    </div>
-                </div>
+                <h2 class="text-center text-primary mb-4">Ajukan Perizinan</h2>
             </div>
-        </div> -->
+        </div>
 
         <section class="content">
             <div class="container-fluid">
-                <div class="row">
-                    <div class="col-md-6 offset-md-3">
-                        <div class="card card-primary">
-                            <div class="card-header">
-                                <h3 class="card-title">Form Pengajuan Perizinan</h3>
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="card shadow-lg border-0 rounded-3">
+                            <div class="card-header bg-primary text-white">
+                                <h4 class="card-title mb-0">Form Pengajuan Perizinan</h4>
                             </div>
-                            
+
                             <div class="card-body">
+                                <!-- Notifikasi -->
                                 <?php if ($successMessage): ?>
-                                    <div class="alert alert-success"><?= $successMessage ?></div>
-                                    <?php unset($_SESSION['success']); ?>
+                                    <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+                                        <i class="fas fa-check-circle me-2"></i> <?= $successMessage ?>
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
                                 <?php endif; ?>
 
                                 <?php if ($errorMessage): ?>
-                                    <div class="alert alert-danger"><?= $errorMessage ?></div>
-                                    <?php unset($_SESSION['error']); ?>
+                                    <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+                                        <i class="fas fa-exclamation-circle me-2"></i> <?= $errorMessage ?>
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
                                 <?php endif; ?>
 
                                 <form action="index.php?page=ajukan_perizinan" method="POST">
-                                    <!-- Nama Pengaju -->
-                                    <div class="form-group">
-                                        <label for="nama_pengaju">Nama Pengaju</label>
-                                        <input type="text" class="form-control" id="nama_pengaju" 
-                                               value="<?php echo $_SESSION['nama'] ?? 'Guest'; ?>" disabled>
+                                    <div class="mb-3">
+                                        <label for="nama_pengaju" class="form-label">Nama Pengaju</label>
+                                        <input type="text" class="form-control shadow-sm" id="nama_pengaju" 
+                                               value="<?= $_SESSION['nama'] ?? 'Guest'; ?>" disabled>
                                     </div>
 
-                                    <!-- NIP -->
-                                    <div class="form-group">
-                                        <label for="nip">NIP</label>
-                                        <input type="text" class="form-control" id="nip" 
-                                               value="<?php echo $_SESSION['nip'] ?? '-'; ?>" disabled>
+                                    <div class="mb-3">
+                                        <label for="nip" class="form-label">NIP</label>
+                                        <input type="text" class="form-control shadow-sm" id="nip" 
+                                               value="<?= $_SESSION['nip'] ?? '-'; ?>" disabled>
                                     </div>
 
-                                    <!-- Jabatan -->
-                                    <div class="form-group">
-                                        <label for="jabatan">Jabatan</label>
-                                        <input type="text" class="form-control" id="jabatan" 
-                                               value="<?php echo $_SESSION['jabatan'] ?? '-'; ?>" disabled>
+                                    <div class="mb-3">
+                                        <label for="jabatan" class="form-label">Jabatan</label>
+                                        <input type="text" class="form-control shadow-sm" id="jabatan" 
+                                               value="<?= $_SESSION['jabatan'] ?? '-'; ?>" disabled>
                                     </div>
 
-                                    <!-- Pilih Atasan -->
-                                    <div class="form-group">
-                                        <label for="atasan">Pilih Atasan</label>
-                                        <select class="form-control" id="atasan" name="atasan" required>
+                                    <div class="mb-3">
+                                        <label for="atasan" class="form-label">Pilih Atasan</label>
+                                        <select class="form-select shadow-sm" id="atasan" name="atasan" required>
                                             <option value="">-- Pilih Atasan --</option>
                                             <?php if (!empty($atasanList)) { ?>
                                                 <?php foreach ($atasanList as $atasan) { ?>
-                                                    <option value="<?php echo htmlspecialchars($atasan['id']); ?>">
-                                                        <?php echo htmlspecialchars($atasan['nama']); ?>
+                                                    <option value="<?= htmlspecialchars($atasan['id']); ?>">
+                                                        <?= htmlspecialchars($atasan['nama']); ?>
                                                     </option>
                                                 <?php } ?>
                                             <?php } else { ?>
@@ -74,39 +71,50 @@
                                         </select>
                                     </div>
 
-                                    <!-- Tanggal dan Waktu Rencana Keluar -->
-                                    <div class="form-group">
-                                        <label for="tanggal_keluar">Tanggal & Waktu Rencana Keluar</label>
-                                        <input type="datetime-local" class="form-control" id="tanggal_keluar" name="tanggal_keluar" required>
+                                    <div class="mb-3">
+                                        <label for="tanggal_keluar" class="form-label">Tanggal & Waktu Rencana Keluar</label>
+                                        <input type="datetime-local" class="form-control shadow-sm" id="tanggal_keluar" name="tanggal_keluar" required>
                                     </div>
 
-                                    <!-- Durasi Keluar (Menit) -->
-                                    <div class="form-group">
-                                        <label for="durasi">Durasi Keluar (Menit)</label>
-                                        <input type="number" class="form-control" id="durasi" name="durasi" required>
+                                    <div class="mb-3">
+                                        <label for="durasi" class="form-label">Durasi Keluar (Menit)</label>
+                                        <input type="number" class="form-control shadow-sm" id="durasi" name="durasi" required>
                                     </div>
 
-                                    <!-- Alasan Perizinan -->
-                                    <div class="form-group">
-                                        <label for="alasan">Alasan Perizinan</label>
-                                        <textarea class="form-control" id="alasan" name="alasan" rows="3" required></textarea>
+                                    <div class="mb-3">
+                                        <label for="alasan" class="form-label">Alasan Perizinan</label>
+                                        <textarea class="form-control shadow-sm" id="alasan" name="alasan" rows="3" required></textarea>
                                     </div>
 
-                                    <button type="submit" class="btn btn-primary btn-block">
+                                    <button type="submit" class="btn btn-primary w-100 shadow-sm mb-3">
                                         <i class="fa fa-paper-plane"></i> Kirim Pengajuan
                                     </button>
                                 </form>
+
+                                <div class="text-center mt-2">
+                                    <a href="index.php?page=dashboard" class="btn btn-outline-primary rounded-pill shadow-sm">
+                                        <i class="fas fa-arrow-left me-2"></i> Kembali ke Dashboard
+                                    </a>
+                                </div>
                             </div>
                         </div>
-
-                        <a href="index.php?page=dashboard" class="btn btn-secondary btn-block">
-                            <i class="fa fa-arrow-left"></i> Kembali ke Dashboard
-                        </a>
                     </div>
                 </div>
             </div>
         </section>
     </div>
 </div>
+
+<style>
+    /* .btn-hover {
+        transition: all 0.3s ease-in-out;
+    } */
+
+    .btn-danger:hover, .btn-outline-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+    }
+</style>
 
 <?php include '../app/views/layouts/footer.php'; ?>
