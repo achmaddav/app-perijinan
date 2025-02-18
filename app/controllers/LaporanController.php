@@ -23,8 +23,10 @@ class LaporanController {
         $status_filter = filter_input(INPUT_GET, 'status', FILTER_SANITIZE_STRING) ?: '';
         $pemohon_filter = filter_input(INPUT_GET, 'pemohon', FILTER_SANITIZE_STRING) ?: '';
         
+        $jabatan = $_SESSION['jabatan'] ?? '';
+
         // Ambil data laporan perizinan berdasarkan filter dan pagination
-        $data = $this->model->getLaporanPerizinan($month_filter, $status_filter, $pemohon_filter, $limit, $offset);
+        $data = $this->model->getLaporanPerizinan($jabatan, $month_filter, $status_filter, $pemohon_filter, $limit, $offset);
         $totalData = $this->model->countTotalLaporan($month_filter, $status_filter, $pemohon_filter);
         $totalPages = ceil($totalData / $limit);
         
@@ -32,7 +34,7 @@ class LaporanController {
         if ($page > $totalPages && $totalPages > 0) {
             $page = $totalPages;
             $offset = ($page - 1) * $limit;
-            $data = $this->model->getLaporanPerizinan($month_filter, $status_filter, $pemohon_filter, $limit, $offset);
+            $data = $this->model->getLaporanPerizinan($jabatan, $month_filter, $status_filter, $pemohon_filter, $limit, $offset);
         }
         
         // Sertakan view dan kirim variabel yang diperlukan

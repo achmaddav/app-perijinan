@@ -1,15 +1,24 @@
 <?php
 require_once "../config/Database.php";
 require_once "../app/models/LogKeluarMasukModel.php";
+require_once "../app/models/PerizinanModel.php";
 
 class LogController
 {
     private $logKeluarMasuk;
+    private $perizinanModel;
 
     public function __construct()
     {
         $db = Database::getInstance()->getConnection();
         $this->logKeluarMasuk = new LogKeluarMasukModel($db);
+        $this->perizinanModel = new PerizinanModel($db);
+    }
+
+    public function verifyList()
+    {
+        $izinList = $this->perizinanModel->getApprovedRequests();
+        require_once '../app/views/satpam/verifikasi.php';
     }
 
     public function verifyKeluar()

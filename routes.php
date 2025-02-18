@@ -12,13 +12,18 @@ function route($conn) {
     // Daftar halaman yang memerlukan login
     $protected_pages = [
         'dashboard',
+        'daftar_pegawai',
+        'user_detail',
         'ajukan_perizinan',
         'riwayat_perizinan',
+        'hapus_perizinan',
+        'daftar_perizinan',
+        'proses_perizinan',
         'persetujuan_perizinan',
         'laporan_perizinan',
-        'verifikasi_keluar_masuk',
-        'daftar_perizinan',
-        'proses_perizinan'
+        'verifikasi',
+        'verify_keluar',
+        'verify_masuk'
     ];
 
     // Redirect ke login jika halaman yang diakses butuh autentikasi
@@ -107,7 +112,9 @@ function route($conn) {
             break;    
 
         case 'verifikasi':
-            require_once "../app/views/satpam/verifikasi.php";
+            require_once '../app/controllers/LogController.php';
+            $controller = new LogController($conn);
+            $controller->verifyList();
             break;
         case 'verify_keluar':
             require_once '../app/controllers/LogController.php';

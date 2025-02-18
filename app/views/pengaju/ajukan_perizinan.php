@@ -22,18 +22,20 @@
 
                             <div class="card-body">
                                 <!-- Notifikasi -->
-                                <?php if ($successMessage): ?>
+                                <?php if (isset($_SESSION['success'])): ?>
                                     <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
-                                        <i class="fas fa-check-circle me-2"></i> <?= $successMessage ?>
+                                        <i class="fas fa-check-circle me-2"></i> <?= $_SESSION['success']; ?>
                                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                     </div>
+                                    <?php unset($_SESSION['success']); ?>
                                 <?php endif; ?>
 
-                                <?php if ($errorMessage): ?>
+                                <?php if (isset($_SESSION['error'])): ?>
                                     <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
-                                        <i class="fas fa-exclamation-circle me-2"></i> <?= $errorMessage ?>
+                                        <i class="fas fa-exclamation-circle me-2"></i> <?= $_SESSION['error']; ?>
                                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                     </div>
+                                    <?php unset($_SESSION['error']); ?>
                                 <?php endif; ?>
 
                                 <form action="index.php?page=ajukan_perizinan" method="POST">

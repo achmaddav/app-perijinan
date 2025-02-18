@@ -23,7 +23,7 @@ class User {
     }
 
     public function getAllUser() {
-        $query = "SELECT id, nama, nip, email, jabatan FROM " . $this->table_name . " WHERE jabatan != 'SuperUser' ORDER By nama ASC";
+        $query = "SELECT id, nama, nip, email, jabatan FROM " . $this->table_name . " WHERE jabatan NOT IN ('SuperUser', 'Satpam') ORDER By nama ASC";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC); 
@@ -41,16 +41,16 @@ class User {
                   LEFT JOIN users AS approver ON p.approved_by = approver.id
                   LEFT JOIN log_keluar_masuk AS l ON l.perizinan_id = p.id
                   LEFT JOIN users AS scrty ON l.satpam_id = scrty.id
-                  WHERE u.jabatan != 'SuperUser'
+                  WHERE u.jabatan NOT IN ('SuperUser', 'Satpam')
                     AND p.status = 'Approved'
                     AND u.id = :id
                   GROUP BY u.id
                   LIMIT 1";
-    
+                  
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
-    }    
+    }        
 }
 ?>

@@ -1,9 +1,3 @@
-<?php
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
-?>
-
 <!-- Sidebar -->
 <aside class="main-sidebar bg-white shadow-sm rounded-4">
     <a href="#" class="brand-link text-decoration-none text-center d-block border-bottom">

@@ -58,7 +58,7 @@ require_once '../config/database.php';
                                         <th>Status</th>
                                         <th>Tanggal Keluar</th>
                                         <th>Durasi</th>
-                                        <th>Atasan</th>
+                                        <th>Approver</th>
                                         <th>Waktu Pengajuan</th>
                                     </tr>
                                 </thead>

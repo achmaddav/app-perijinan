@@ -1,14 +1,3 @@
-<?php
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
-
-if (!isset($_SESSION['user_id'])) {
-    header("Location: index.php?page=login");
-    exit();
-}
-?>
-
 <!-- Navbar -->
 <nav class="main-header navbar navbar-expand-lg bg-white shadow-sm border-bottom">
     <div class="container-fluid">

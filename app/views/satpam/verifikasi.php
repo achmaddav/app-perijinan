@@ -1,8 +1,6 @@
 <?php 
 include '../app/views/layouts/header.php'; 
 require_once "../app/models/PerizinanModel.php";
-$perizinanModel = new PerizinanModel(Database::getInstance()->getConnection());
-$izinList = $perizinanModel->getApprovedRequests();
 ?>
 
 <div class="wrapper">

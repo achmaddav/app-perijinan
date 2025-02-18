@@ -66,7 +66,7 @@ class PerizinanModel {
         return $stmt->execute();    
     }
 
-    public function getLaporanPerizinan($month, $status, $pemohon, $limit, $offset) {
+    public function getLaporanPerizinan($jabatan, $month, $status, $pemohon, $limit, $offset) {
         // Pastikan user telah login
         if (!isset($_SESSION['user_id'])) {
             header("Location: index.php?page=login");
@@ -74,21 +74,34 @@ class PerizinanModel {
         }
         $user_id = $_SESSION['user_id'];
         
-        // Mulai query dengan filter bulan dan user_id
-        $query = "SELECT p.id, u.nama AS nama_pemohon, p.alasan, p.status, 
-                         p.tanggal_rencana_keluar, p.durasi_keluar, 
-                         a.nama AS nama_atasan, p.created_at 
+        // Dasar query dan parameter
+        $query = "SELECT 
+                    p.id, 
+                    u.nama AS nama_pemohon, 
+                    p.alasan, 
+                    p.status, 
+                    p.tanggal_rencana_keluar, 
+                    p.durasi_keluar, 
+                    a.nama AS nama_atasan, 
+                    p.created_at 
                   FROM perizinan p
                   JOIN users u ON p.user_id = u.id
                   LEFT JOIN users a ON p.approved_by = a.id
-                  WHERE DATE_FORMAT(p.created_at, '%Y-%m') = :month
-                    AND p.approved_by = :user_id";
+                  WHERE DATE_FORMAT(p.created_at, '%Y-%m') = :month";
+        
+        // Jika jabatan Atasan, filter perizinan yang disetujui oleh user tersebut
+        if ($jabatan === 'Atasan') {
+            $query .= " AND p.approved_by = :user_id";
+        }
         
         // Siapkan parameter dasar
         $params = [
-            ':month'   => $month,
-            ':user_id' => $user_id
+            ':month' => $month
         ];
+        
+        if ($jabatan === 'Atasan') {
+            $params[':user_id'] = $user_id;
+        }
         
         // Tambahkan filter status jika diberikan
         if (!empty($status)) {
@@ -96,7 +109,7 @@ class PerizinanModel {
             $params[':status'] = $status;
         }
         
-        // Tambahkan filter pemohon jika diberikan
+        // Tambahkan filter nama pemohon jika diberikan
         if (!empty($pemohon)) {
             $query .= " AND u.nama LIKE :pemohon";
             $params[':pemohon'] = "%" . $pemohon . "%";
@@ -108,8 +121,9 @@ class PerizinanModel {
         
         // Bind parameter dinamis
         foreach ($params as $key => $value) {
-            // Gunakan PDO::PARAM_INT untuk nilai integer, PDO::PARAM_STR untuk string
-            $stmt->bindValue($key, $value, is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR);
+            // Tentukan tipe data: integer atau string
+            $paramType = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
+            $stmt->bindValue($key, $value, $paramType);
         }
         
         // Bind limit dan offset sebagai integer
@@ -118,7 +132,8 @@ class PerizinanModel {
         
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }    
+    }
+        
     
     // Tambahkan metode untuk menghitung total data
     public function countTotalLaporan($month, $status, $pemohon) {

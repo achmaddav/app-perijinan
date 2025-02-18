@@ -64,7 +64,7 @@ class AtasanController {
                 require_once '../app/views/atasan/detail_user.php';
             } else {
                 // Jika user tidak ditemukan, set pesan error dan redirect kembali ke daftar user
-                $_SESSION['error'] = "User tidak ditemukan.";
+                $_SESSION['error'] = "User belum melakukan permohonan izin.";
                 header("Location: index.php?page=daftar_pegawai");
                 exit();
             }
