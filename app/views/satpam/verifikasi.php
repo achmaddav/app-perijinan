@@ -1,11 +1,10 @@
 <?php 
-include '../app/views/layouts/header.php'; 
-require_once "../app/models/PerizinanModel.php";
+include __DIR__ . '/../layouts/header.php'; 
 ?>
 
 <div class="wrapper">
-    <?php include '../app/views/layouts/navbar.php'; ?>
-    <?php include '../app/views/layouts/sidebar.php'; ?>
+    <?php include __DIR__ . '/../layouts/navbar.php'; ?>
+    <?php include __DIR__ . '/../layouts/sidebar.php'; ?>
 
     <div class="content-wrapper">
         <section class="content">
@@ -66,7 +65,7 @@ require_once "../app/models/PerizinanModel.php";
                                                 </td>
                                                 <td class="text-center">
                                                     <?php if (empty($izin['tanggal_keluar'])): ?>
-                                                        <form action="index.php?page=verify_keluar" method="POST">
+                                                        <form action="/app-perijinan/verify_keluar" method="POST">
                                                             <input type="hidden" name="perizinan_id" value="<?= $izin['id']; ?>">
                                                             <button type="submit" class="btn btn-warning btn-sm rounded-pill shadow-sm">Verifikasi Keluar</button>
                                                         </form>
@@ -76,7 +75,7 @@ require_once "../app/models/PerizinanModel.php";
                                                 </td>
                                                 <td class="text-center">
                                                     <?php if (!empty($izin['tanggal_keluar']) && empty($izin['tanggal_masuk'])): ?>
-                                                        <form action="index.php?page=verify_masuk" method="POST">
+                                                        <form action="/app-perijinan/verify_masuk" method="POST">
                                                             <input type="hidden" name="perizinan_id" value="<?= $izin['id']; ?>">
                                                             <button type="submit" class="btn btn-secondary btn-sm rounded-pill shadow-sm">Verifikasi Masuk</button>
                                                         </form>
@@ -95,7 +94,7 @@ require_once "../app/models/PerizinanModel.php";
 
                 <!-- Tombol Kembali ke Dashboard -->
                 <div class="text-center mt-4">
-                    <a href="index.php?page=dashboard" class="btn btn-outline-primary rounded-pill shadow-sm">
+                    <a href="/app-perijinan/dashboard" class="btn btn-outline-primary rounded-pill shadow-sm">
                         <i class="fas fa-arrow-left me-2"></i> Kembali ke Dashboard
                     </a>
                 </div>
@@ -128,4 +127,4 @@ require_once "../app/models/PerizinanModel.php";
     }
 </style>
 
-<?php include '../app/views/layouts/footer.php'; ?>
+<?php include __DIR__ . '/../layouts/footer.php'; ?>

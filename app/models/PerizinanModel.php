@@ -28,8 +28,16 @@ class PerizinanModel {
 
     // Mengambil riwayat perizinan berdasarkan user_id
     public function getStatusPerizinan($user_id) {
-        $stmt = $this->conn->prepare("SELECT * FROM perizinan WHERE user_id = ? ORDER BY created_at DESC");
-        $stmt->execute([$user_id]);
+        $query = "SELECT p.*, u.nama AS nama_atasan 
+                  FROM perizinan p 
+                  JOIN users u ON p.approved_by = u.id
+                  WHERE p.user_id = :user_id 
+                  ORDER BY created_at DESC";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+        $stmt->execute();
+        
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 

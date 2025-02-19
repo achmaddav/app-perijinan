@@ -61,7 +61,7 @@
                 document.getElementById("alasanPerizinan").textContent = alasan;
 
                 // Set link hapus dengan ID yang dipilih
-                document.getElementById("btnHapus").href = "index.php?page=hapus_perizinan&id=" + id;
+                document.getElementById("btnHapus").href = "/app-perijinan/hapus_perizinan&id=" + id;
             });
         }
     });

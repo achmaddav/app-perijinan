@@ -1,0 +1,12 @@
+RewriteEngine On
+RewriteBase /app-perijinan/
+
+# Redirect jika ada /public di URL
+RewriteCond %{REQUEST_URI} ^/app-perijinan/public/
+RewriteRule ^public/(.*)$ /$1 [R=301,L]
+
+# Redirect semua request ke index.php jika bukan file atau folder
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php?page=$1 [QSA,L]
+

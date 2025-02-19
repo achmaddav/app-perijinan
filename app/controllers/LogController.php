@@ -1,16 +1,14 @@
 <?php
-require_once "../config/Database.php";
-require_once "../app/models/LogKeluarMasukModel.php";
-require_once "../app/models/PerizinanModel.php";
+require_once __DIR__ . "/../models/LogKeluarMasukModel.php";
+require_once __DIR__ . "/../models/PerizinanModel.php";
 
 class LogController
 {
     private $logKeluarMasuk;
     private $perizinanModel;
 
-    public function __construct()
+    public function __construct($db)
     {
-        $db = Database::getInstance()->getConnection();
         $this->logKeluarMasuk = new LogKeluarMasukModel($db);
         $this->perizinanModel = new PerizinanModel($db);
     }
@@ -18,19 +16,19 @@ class LogController
     public function verifyList()
     {
         $izinList = $this->perizinanModel->getApprovedRequests();
-        require_once '../app/views/satpam/verifikasi.php';
+        require_once __DIR__ . '/../views/satpam/verifikasi.php';
     }
 
     public function historyVerify()
     {
         $historyList = $this->logKeluarMasuk->getHistoryOutIn();
-        require_once '../app/views/satpam/history_verifikasi.php';
+        require_once __DIR__ . '/../views/satpam/history_verifikasi.php';
     }
 
     public function verifyKeluar()
     {
         if (!isset($_SESSION['user_id']) || $_SESSION['jabatan'] !== 'Satpam') {
-            header("Location: index.php?page=dashboard");
+            header("Location: dashboard");
             exit();
         }
 
@@ -44,7 +42,7 @@ class LogController
                 $_SESSION['error'] = "Terjadi kesalahan saat verifikasi keluar.";
             }
 
-            header("Location: index.php?page=verifikasi");
+            header("Location: verifikasi");
             exit();
         }
     }
@@ -52,7 +50,7 @@ class LogController
     public function verifyMasuk()
     {
         if (!isset($_SESSION['user_id']) || $_SESSION['jabatan'] !== 'Satpam') {
-            header("Location: index.php?page=dashboard");
+            header("Location: dashboard");
             exit();
         }
 
@@ -70,7 +68,7 @@ class LogController
                 $_SESSION['error'] = "Log keluar tidak ditemukan.";
             }
 
-            header("Location: index.php?page=verifikasi");
+            header("Location: verifikasi");
             exit();
         }
     }

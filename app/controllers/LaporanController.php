@@ -38,7 +38,7 @@ class LaporanController {
         }
         
         // Sertakan view dan kirim variabel yang diperlukan
-        require_once '../app/views/atasan/laporan_perizinan.php';
+        require_once __DIR__ . '/../views/atasan/laporan_perizinan.php';
     }
 }
 ?>

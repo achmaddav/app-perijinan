@@ -1,5 +1,5 @@
 <?php 
-include '../app/views/layouts/header.php'; 
+include __DIR__ . '/../layouts/header.php'; 
 ?>
 
 <div class="wrapper">
@@ -65,7 +65,7 @@ include '../app/views/layouts/header.php';
                                                 </td>
                                                 <td class="text-center">
                                                     <?php if (empty($izin['tanggal_keluar'])): ?>
-                                                        <form action="index.php?page=verify_keluar" method="POST">
+                                                        <form action="/app-perijinan/verify_keluar" method="POST">
                                                             <input type="hidden" name="perizinan_id" value="<?= $izin['id']; ?>">
                                                             <button type="submit" class="btn btn-warning btn-sm rounded-pill shadow-sm">Verifikasi Keluar</button>
                                                         </form>
@@ -75,7 +75,7 @@ include '../app/views/layouts/header.php';
                                                 </td>
                                                 <td class="text-center">
                                                     <?php if (!empty($izin['tanggal_keluar']) && empty($izin['tanggal_masuk'])): ?>
-                                                        <form action="index.php?page=verify_masuk" method="POST">
+                                                        <form action="/app-perijinan/verify_masuk" method="POST">
                                                             <input type="hidden" name="perizinan_id" value="<?= $izin['id']; ?>">
                                                             <button type="submit" class="btn btn-secondary btn-sm rounded-pill shadow-sm">Verifikasi Masuk</button>
                                                         </form>
@@ -94,7 +94,7 @@ include '../app/views/layouts/header.php';
 
                 <!-- Tombol Kembali ke Dashboard -->
                 <div class="text-center mt-4">
-                    <a href="index.php?page=dashboard" class="btn btn-outline-primary rounded-pill shadow-sm">
+                    <a href="/app-perijinan/dashboard" class="btn btn-outline-primary rounded-pill shadow-sm">
                         <i class="fas fa-arrow-left me-2"></i> Kembali ke Dashboard
                     </a>
                 </div>

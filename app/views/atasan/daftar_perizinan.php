@@ -1,8 +1,8 @@
-<?php include '../app/views/layouts/header.php'; ?>
+<?php include __DIR__ . '/../layouts/header.php'; ?>
 
 <div class="wrapper">
-    <?php include '../app/views/layouts/navbar.php'; ?>
-    <?php include '../app/views/layouts/sidebar.php'; ?>
+    <?php include __DIR__ . '/../layouts/navbar.php'; ?>
+    <?php include __DIR__ . '/../layouts/sidebar.php'; ?>
 
     <div class="content-wrapper">
         <section class="content">
@@ -61,7 +61,7 @@
                                                 </td>
                                                 <td><?= htmlspecialchars($izin['created_at']); ?></td>
                                                 <td>
-                                                    <form action="index.php?page=proses_perizinan" method="POST">
+                                                    <form action="/app-perijinan/proses_perizinan" method="POST">
                                                         <input type="hidden" name="id" value="<?= $izin['id']; ?>">
                                                         <button type="submit" name="status" value="Disetujui" class="btn btn-success btn-sm rounded-pill shadow-sm">
                                                             <i class="fas fa-check-circle me-1"></i> Setujui
@@ -82,7 +82,7 @@
 
                 <!-- Tombol Kembali ke Dashboard -->
                 <div class="text-center mt-4">
-                    <a href="index.php?page=dashboard" class="btn btn-outline-primary rounded-pill shadow-sm">
+                    <a href="/app-perijinan/dashboard" class="btn btn-outline-primary rounded-pill shadow-sm">
                         <i class="fas fa-arrow-left me-2"></i> Kembali ke Dashboard
                     </a>
                 </div>
@@ -119,6 +119,6 @@
     }
 </style>
 
-<?php include '../app/views/layouts/footer.php'; ?>
+<?php include __DIR__ . '/../layouts/footer.php'; ?>
 
 

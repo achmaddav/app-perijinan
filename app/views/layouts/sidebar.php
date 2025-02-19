@@ -9,7 +9,7 @@
 
                 <!-- Dashboard -->
                 <li class="nav-item">
-                    <a href="index.php?page=dashboard" class="nav-link text-dark rounded-3">
+                    <a href="/app-perijinan/dashboard" class="nav-link text-dark rounded-3">
                         <i class="nav-icon fas fa-home text-primary"></i>
                         <p>Dashboard</p>
                     </a>
@@ -18,13 +18,13 @@
                 <!-- Menu untuk User dan Atasan (Ajukan & Riwayat Perizinan) -->
                 <?php if ($jabatan === 'User' || $jabatan === 'Atasan') { ?>
                     <li class="nav-item">
-                        <a href="index.php?page=ajukan_perizinan" class="nav-link text-dark rounded-3">
+                        <a href="/app-perijinan/ajukan_perizinan" class="nav-link text-dark rounded-3">
                             <i class="nav-icon fas fa-edit text-success"></i>
                             <p>Ajukan Perizinan</p>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="index.php?page=status_perizinan" class="nav-link text-dark rounded-3">
+                        <a href="/app-perijinan/status_perizinan" class="nav-link text-dark rounded-3">
                             <i class="nav-icon fas fa-history text-info"></i>
                             <p>Status Perizinan</p>
                         </a>
@@ -34,7 +34,7 @@
                 <!-- Menu untuk SuperUser (Daftar Pegawai) -->
                 <?php if ($jabatan === 'SuperUser') { ?>
                     <li class="nav-item">
-                        <a href="index.php?page=daftar_pegawai" class="nav-link text-dark rounded-3">
+                        <a href="/app-perijinan/daftar_pegawai" class="nav-link text-dark rounded-3">
                             <i class="nav-icon fas fa-user text-warning"></i>
                             <p>Daftar Pegawai</p>
                         </a>
@@ -44,13 +44,13 @@
                 <!-- Menu untuk Atasan dan SuperUser (Daftar & Laporan Perizinan) -->
                 <?php if ($jabatan === 'Atasan' || $jabatan === 'SuperUser') { ?>
                     <li class="nav-item">
-                        <a href="index.php?page=daftar_perizinan" class="nav-link text-dark rounded-3">
+                        <a href="/app-perijinan/daftar_perizinan" class="nav-link text-dark rounded-3">
                             <i class="nav-icon fas fa-list text-secondary"></i>
                             <p>Daftar Perizinan</p>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="index.php?page=laporan_perizinan" class="nav-link text-dark rounded-3">
+                        <a href="/app-perijinan/laporan_perizinan" class="nav-link text-dark rounded-3">
                             <i class="nav-icon fas fa-file-alt text-danger"></i>
                             <p>Laporan Perizinan</p>
                         </a>
@@ -60,7 +60,7 @@
                 <!-- Menu untuk Satpam -->
                 <?php if ($jabatan === 'Satpam') { ?>
                     <li class="nav-item">
-                        <a href="index.php?page=verifikasi" class="nav-link text-dark rounded-3">
+                        <a href="/app-perijinan/verifikasi" class="nav-link text-dark rounded-3">
                             <i class="nav-icon fas fa-user-check text-danger"></i>
                             <p>Verifikasi Keluar Masuk</p>
                         </a>
@@ -92,7 +92,7 @@
             </div>
             <div class="modal-footer border-0">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <a href="index.php?page=logout" class="btn btn-danger">Ya, Logout</a>
+                <a href="/app-perijinan/logout" class="btn btn-danger">Ya, Logout</a>
             </div>
         </div>
     </div>

@@ -1,8 +1,8 @@
-<?php include '../app/views/layouts/header.php'; ?>
+<?php include __DIR__ . '/../layouts/header.php'; ?>
 
 <div class="wrapper">
-    <?php include '../app/views/layouts/navbar.php'; ?>
-    <?php include '../app/views/layouts/sidebar.php'; ?>
+    <?php include __DIR__ . '/../layouts/navbar.php'; ?>
+    <?php include __DIR__ . '/../layouts/sidebar.php'; ?>
 
     <div class="content-wrapper">
         <div class="content-header">
@@ -38,7 +38,7 @@
                                     <?php unset($_SESSION['error']); ?>
                                 <?php endif; ?>
 
-                                <form action="index.php?page=ajukan_perizinan" method="POST">
+                                <form action="/app-perijinan/ajukan_perizinan" method="POST">
                                     <div class="row mb-3">
                                         <label for="nama_pengaju" class="col-md-4 col-form-label">Nama Pengaju</label>
                                         <div class="col-md-8">
@@ -107,7 +107,7 @@
                                         <button type="submit" class="btn btn-outline-success rounded-pill shadow-sm mb-3 mb-md-0 me-md-2 w-100">
                                             <i class="fa fa-paper-plane me-2"></i> Kirim Pengajuan
                                         </button>
-                                        <a href="index.php?page=dashboard" class="btn btn-outline-primary rounded-pill shadow-sm w-100">
+                                        <a href="/app-perijinan/dashboard" class="btn btn-outline-primary rounded-pill shadow-sm w-100">
                                             <i class="fas fa-arrow-left me-2"></i> Kembali ke Dashboard
                                         </a>
                                     </div>
@@ -129,4 +129,4 @@
     }
 </style>
 
-<?php include '../app/views/layouts/footer.php'; ?>
+<?php include  __DIR__ . '/../layouts/footer.php'; ?>

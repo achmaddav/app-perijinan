@@ -1,8 +1,8 @@
-<?php include '../app/views/layouts/header.php'; ?>
+<?php include __DIR__ . '/../layouts/header.php'; ?>
 <div class="wrapper">
 
-    <?php include '../app/views/layouts/navbar.php'; ?>
-    <?php include '../app/views/layouts/sidebar.php'; ?>
+    <?php include __DIR__ . '/../layouts/navbar.php'; ?>
+    <?php include __DIR__ . '/../layouts/sidebar.php'; ?>
 
     <!-- Konten Utama -->
     <div class="content-wrapper">
@@ -37,6 +37,7 @@
                                         <th>Alasan</th>
                                         <th>Status</th>
                                         <th>Tanggal Pengajuan</th>
+                                        <th>Atasan</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
@@ -57,6 +58,7 @@
                                                     <span class="<?= $statusClass; ?>"><?= htmlspecialchars($izin['status']); ?></span>
                                                 </td>
                                                 <td><?= htmlspecialchars($izin['created_at']); ?></td>
+                                                <td><?= htmlspecialchars($izin['nama_atasan']); ?></td>
                                                 <td>
                                                     <?php if ($izin['status'] === 'Approved' || $izin['status'] === 'Rejected'): ?>
                                                         <button class="btn btn-sm btn-secondary shadow-sm rounded-3"
@@ -82,7 +84,7 @@
                     </div>
                 </div>
                 <div class="text-center mt-4">
-                    <a href="index.php?page=dashboard" class="btn btn-outline-primary rounded-pill shadow-sm">
+                    <a href="/app-perijinan/dashboard" class="btn btn-outline-primary rounded-pill shadow-sm">
                         <i class="fas fa-arrow-left me-2"></i> Kembali ke Dashboard
                     </a>
                 </div>
@@ -140,6 +142,6 @@
     }
 </style>
 
-<?php include '../app/views/layouts/footer.php'; ?>
+<?php include __DIR__ . '/../layouts/footer.php'; ?>
 
 

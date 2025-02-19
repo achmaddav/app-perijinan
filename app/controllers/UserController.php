@@ -1,6 +1,6 @@
 <?php
-include_once "../config/database.php";
-include_once "../app/models/User.php";
+require_once __DIR__ . "/../models/User.php";
+
 
 class UserController
 {
@@ -13,7 +13,7 @@ class UserController
 
     public function login()
     {
-        include "../app/views/login.php";
+        include __DIR__ . "/../views/login.php";
     }
 
     public function authenticate()
@@ -32,13 +32,13 @@ class UserController
                     $_SESSION['nama'] = $user['nama'];
                     $_SESSION['jabatan'] = $user['jabatan'];
                     $_SESSION['nip'] = $user['nip'];
-
-                    header("Location: index.php?page=dashboard");
+                    
+                    header("Location: dashboard");
                     exit();
                 }
             }
 
-            echo "<script>alert('Login gagal! Periksa email dan password.'); window.location.href='index.php?page=login';</script>";
+            echo "<script>alert('Login gagal! Periksa email dan password.'); window.location.href='login';</script>";
             exit();
         }
     }
@@ -50,7 +50,7 @@ class UserController
             require_once '../app/views/common-users/user_info.php';
         } else {
             $_SESSION['error'] = "Info user tidak ditemukan.";
-            header("Location: index.php?page=dashboard");
+            header("Location: dashboard");
             exit();
         }
     }

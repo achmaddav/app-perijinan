@@ -51,7 +51,7 @@
 <body>
   <div class="login-container">
     <h3 class="text-center">Login</h3>
-    <form action="index.php?page=authenticate" method="post">
+    <form action="/app-perijinan/authenticate" method="post">
       <div class="mb-3">
         <label for="email" class="form-label">Email</label>
         <input type="email" name="email" class="form-control" placeholder="Masukkan email" required>

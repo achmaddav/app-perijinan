@@ -1,8 +1,8 @@
-<?php include '../app/views/layouts/header.php'; ?>
+<?php include __DIR__ . '/../layouts/header.php'; ?>
 
 <div class="wrapper">
-    <?php include '../app/views/layouts/navbar.php'; ?>
-    <?php include '../app/views/layouts/sidebar.php'; ?>
+    <?php include __DIR__ . '/../layouts/navbar.php'; ?>
+    <?php include __DIR__ . '/../layouts/sidebar.php'; ?>
 
     <div class="content-wrapper">
         <section class="content">
@@ -51,7 +51,7 @@
                                                 <td><?= htmlspecialchars($user['email']); ?></td>
                                                 <td><?= htmlspecialchars($user['jabatan']); ?></td>
                                                 <td>
-                                                    <form action="index.php?page=user_detail" method="POST">
+                                                    <form action="/app-perijinan/user_detail" method="POST">
                                                         <input type="hidden" name="id" value="<?= htmlspecialchars($user['id']); ?>">
                                                         <button type="submit" name="detail" class="btn btn-info btn-sm rounded-pill shadow-sm">
                                                             <i class="fas fa-user-circle me-1"></i> Detail
@@ -69,7 +69,7 @@
 
                 <!-- Tombol Kembali ke Dashboard -->
                 <div class="text-center mt-4">
-                    <a href="index.php?page=dashboard" class="btn btn-outline-primary rounded-pill shadow-sm">
+                    <a href="/app-perijinan/dashboard" class="btn btn-outline-primary rounded-pill shadow-sm">
                         <i class="fas fa-arrow-left me-2"></i> Kembali ke Dashboard
                     </a>
                 </div>
@@ -106,6 +106,6 @@
     }
 </style>
 
-<?php include '../app/views/layouts/footer.php'; ?>
+<?php include __DIR__ . '/../layouts/footer.php'; ?>
 
 

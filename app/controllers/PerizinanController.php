@@ -1,6 +1,5 @@
 <?php
-require_once '../config/database.php';
-require_once '../app/models/PerizinanModel.php';
+require_once __DIR__ . '/../models/PerizinanModel.php';
 
 class PerizinanController {
     private $model;
@@ -12,7 +11,7 @@ class PerizinanController {
     // Menampilkan halaman form pengajuan perizinan
     public function formAjukanPerizinan() {
         if (!isset($_SESSION['user_id'])) {
-            header("Location: index.php?page=login");
+            header("Location: login");
             exit();
         }
 
@@ -25,7 +24,7 @@ class PerizinanController {
             $atasanList = $this->model->getAtasanList('SuperUser');
         }
 
-        require_once '../app/views/pengaju/ajukan_perizinan.php';
+        require_once __DIR__ . '/../views/pengaju/ajukan_perizinan.php';
     }
 
     // Menangani penyimpanan data perizinan
@@ -40,7 +39,7 @@ class PerizinanController {
 
             if (empty($alasan)) {
                 $_SESSION['error'] = "Alasan perizinan tidak boleh kosong.";
-                header("Location: index.php?page=ajukan_perizinan");
+                header("Location: ajukan_perizinan");
                 exit();
             }
 
@@ -53,7 +52,7 @@ class PerizinanController {
             }
             session_write_close();
 
-            header("Location: index.php?page=ajukan_perizinan");
+            header("Location: ajukan_perizinan");
             exit();
         }
     }
@@ -61,20 +60,21 @@ class PerizinanController {
     // Menampilkan riwayat perizinan user
     public function statusPerizinan() {
         if (!isset($_SESSION['user_id'])) {
-            header("Location: index.php?page=login");
+            header("Location: login");
             exit();
         }
 
         $user_id = $_SESSION['user_id'];
         $dataPerizinan = $this->model->getStatusPerizinan($user_id);
 
-        require_once '../app/views/pengaju/status_perizinan.php';
+        require_once __DIR__ . '/../views/pengaju/status_perizinan.php';
     }
 
     public function hapusPerizinan()
     {
         if (!isset($_GET['id'])) {
-            header("Location: index.php?page=status_perizinan&errorMessage=ID tidak valid.");
+            $_SESSION['error'] = "ID tidak valid.";
+            header("Location: status_perizinan");
             exit;
         }
 
@@ -82,21 +82,26 @@ class PerizinanController {
         $status = $this->model->getStatus($id);
 
         if (!$status) {
-            header("Location: index.php?page=status_perizinan&errorMessage=Data tidak ditemukan!");
+            $_SESSION['error'] = "Data tidak ditemukan!";
+            header("Location: status_perizinan");
             exit;
         }
 
         if ($status['status'] === 'Approved' || $status['status'] === 'Rejected') {
-            header("Location: index.php?page=status_perizinan&errorMessage=Data tidak bisa dihapus karena status sudah " . $status['status']);
+            $_SESSION['error'] = "Data tidak bisa dihapus karena status sudah " . $status['status'];
+            header("Location: status_perizinan");
             exit;
         }
 
         if ($this->model->delete($id)) {
-            header("Location: index.php?page=status_perizinan&successMessage=Data berhasil dihapus!");
+            $_SESSION['success'] = "Data berhasil dihapus!";
         } else {
-            header("Location: index.php?page=status_perizinan&errorMessage=Gagal menghapus data.");
+            $_SESSION['error'] = "Gagal menghapus data.";
         }
+        
+        header("Location: status_perizinan");
         exit;
     }
+
 }
 ?>

@@ -1,6 +1,6 @@
 <?php
-require_once '../app/models/PerizinanModel.php';
-require_once '../app/models/User.php';
+require_once __DIR__ . '/../models/PerizinanModel.php';
+require_once __DIR__ . '/../models/User.php';
 
 class AtasanController {
     private $perizinanModel;
@@ -14,7 +14,7 @@ class AtasanController {
     // Menampilkan daftar perizinan yang menunggu persetujuan
     public function listPerizinan() {
         $dataPerizinan = $this->perizinanModel->getPendingPerizinan();
-        require_once '../app/views/atasan/daftar_perizinan.php';
+        require_once __DIR__ . '/../views/atasan/daftar_perizinan.php';
     }
 
     // Atasan menyetujui atau menolak perizinan
@@ -31,7 +31,7 @@ class AtasanController {
                 $status = "Rejected";
             } else {
                 $_SESSION['error'] = "Status tidak valid.";
-                header("Location: index.php?page=daftar_perizinan");
+                header("Location: daftar_perizinan");
                 exit();
             }
     
@@ -41,14 +41,14 @@ class AtasanController {
                 $_SESSION['error'] = "Terjadi kesalahan saat memperbarui perizinan.";
             }
     
-            header("Location: index.php?page=daftar_perizinan");
+            header("Location: daftar_perizinan");
             exit();
         }
     }    
 
     public function getUsers() {
         $users = $this->userModel->getAllUser();
-        require_once '../app/views/atasan/daftar_user.php';
+        require_once __DIR__ . '/../views/atasan/daftar_user.php';
     }
 
     public function getUserDetail() {
@@ -61,16 +61,16 @@ class AtasanController {
 
             // Jika user ditemukan, tampilkan view detail
             if ($user) {
-                require_once '../app/views/atasan/detail_user.php';
+                require_once __DIR__ . '/../views/atasan/detail_user.php';
             } else {
                 // Jika user tidak ditemukan, set pesan error dan redirect kembali ke daftar user
                 $_SESSION['error'] = "User belum melakukan permohonan izin.";
-                header("Location: index.php?page=daftar_pegawai");
+                header("Location: daftar_pegawai");
                 exit();
             }
         } else {
             // Jika tidak ada id atau metode tidak POST, redirect ke halaman daftar user
-            header("Location: index.php?page=daftar_pegawai");
+            header("Location: daftar_pegawai");
             exit();
         }
     }

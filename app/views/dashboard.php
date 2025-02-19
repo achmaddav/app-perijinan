@@ -1,8 +1,8 @@
-<?php include '../app/views/layouts/header.php'; ?>
+<?php include __DIR__ . '/layouts/header.php'; ?>
 <div class="wrapper">
 
-    <?php include '../app/views/layouts/navbar.php'; ?>
-    <?php include '../app/views/layouts/sidebar.php'; ?>
+    <?php include __DIR__ . '/layouts/navbar.php'; ?>
+    <?php include __DIR__ . '/layouts/sidebar.php'; ?>
 
     <!-- Content Wrapper -->
     <div class="content-wrapper">
@@ -27,7 +27,7 @@
                             <div class="card-body">
                                 <h5 class="card-title text-primary">Ajukan Perizinan</h5>
                                 <p class="card-text text-muted">Ajukan perizinan dengan mudah melalui sistem.</p>
-                                <a href="index.php?page=ajukan_perizinan" class="btn btn-outline-primary rounded-pill">Ajukan</a>
+                                <a href="/app-perijinan/ajukan_perizinan" class="btn btn-outline-primary rounded-pill">Ajukan</a>
                             </div>
                         </div>
                     </div>
@@ -36,7 +36,7 @@
                             <div class="card-body">
                                 <h5 class="card-title text-info">Status Perizinan</h5>
                                 <p class="card-text text-muted">Lihat riwayat perizinan yang telah Anda ajukan.</p>
-                                <a href="index.php?page=status_perizinan" class="btn btn-outline-info rounded-pill">Lihat Status</a>
+                                <a href="/app-perijinan/status_perizinan" class="btn btn-outline-info rounded-pill">Lihat Status</a>
                             </div>
                         </div>
                     </div>
@@ -48,7 +48,7 @@
                             <div class="card-body">
                                 <h5 class="card-title text-info">Daftar Pegawai</h5>
                                 <p class="card-text text-muted">Lihat semua data pegawai.</p>
-                                <a href="index.php?page=daftar_pegawai" class="btn btn-outline-info rounded-pill">Lihat Daftar</a>
+                                <a href="/app-perijinan/daftar_pegawai" class="btn btn-outline-info rounded-pill">Lihat Daftar</a>
                             </div>
                         </div>
                     </div>
@@ -60,7 +60,7 @@
                             <div class="card-body">
                                 <h5 class="card-title text-secondary">Daftar Perizinan</h5>
                                 <p class="card-text text-muted">Lihat semua perizinan karyawan yang sedang berlangsung.</p>
-                                <a href="index.php?page=daftar_perizinan" class="btn btn-outline-secondary rounded-pill">Lihat Daftar</a>
+                                <a href="/app-perijinan/daftar_perizinan" class="btn btn-outline-secondary rounded-pill">Lihat Daftar</a>
                             </div>
                         </div>
                     </div>
@@ -69,7 +69,7 @@
                             <div class="card-body">
                                 <h5 class="card-title text-warning">Laporan Perizinan</h5>
                                 <p class="card-text text-muted">Lihat laporan perizinan untuk analisis.</p>
-                                <a href="index.php?page=laporan_perizinan" class="btn btn-outline-warning rounded-pill">Lihat Laporan</a>
+                                <a href="/app-perijinan/laporan_perizinan" class="btn btn-outline-warning rounded-pill">Lihat Laporan</a>
                             </div>
                         </div>
                     </div>
@@ -81,7 +81,7 @@
                             <div class="card-body">
                                 <h5 class="card-title text-danger">Verifikasi Keluar Masuk</h5>
                                 <p class="card-text text-muted">Pastikan keabsahan perizinan masuk dan keluar.</p>
-                                <a href="index.php?page=verifikasi" class="btn btn-outline-danger rounded-pill">Verifikasi</a>
+                                <a href="/app-perijinan/verifikasi" class="btn btn-outline-danger rounded-pill">Verifikasi</a>
                             </div>
                         </div>
                     </div>
@@ -112,7 +112,7 @@
     }
 </style>
 
-<?php include '../app/views/layouts/footer.php'; ?>
+<?php include __DIR__ . '/layouts/footer.php'; ?>
 
 
 

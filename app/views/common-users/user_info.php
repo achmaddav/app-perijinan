@@ -33,7 +33,7 @@
                 </div>
 
                 <div class="text-center mt-4">
-                    <a href="index.php?page=daftar_pegawai" class="btn btn-outline-primary rounded-pill shadow-sm">
+                    <a href="/app-perijinan/daftar_pegawai" class="btn btn-outline-primary rounded-pill shadow-sm">
                         <i class="fas fa-arrow-left me-2"></i> Kembali ke Daftar Pegawai
                     </a>
                 </div>

@@ -17,7 +17,7 @@
                     <i class="fas fa-user-circle"></i> <?php echo $nama; ?>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end shadow-sm rounded-3" aria-labelledby="userDropdown">
-                    <li><a class="dropdown-item" href="index.php?page=profil"><i class="fas fa-user me-2"></i> Profil</a></li>
+                    <li><a class="dropdown-item" href="/app-perijinan/profil"><i class="fas fa-user me-2"></i> Profil</a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
                 </ul>
@@ -39,7 +39,7 @@
             </div>
             <div class="modal-footer border-0">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <a href="index.php?page=logout" class="btn btn-danger">Ya, Logout</a>
+                <a href="/app-perijinan/logout" class="btn btn-danger">Ya, Logout</a>
             </div>
         </div>
     </div>
