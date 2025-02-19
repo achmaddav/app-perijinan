@@ -51,6 +51,22 @@ class User {
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
-    }        
+    }
+    
+    public function getUserById($id) {
+        $query = "SELECT 
+                    nama AS user_nama,
+                    nip,
+                    email,
+                    jabatan
+                  FROM users 
+                  WHERE id = :id
+                  LIMIT 1";
+                  
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 }
 ?>

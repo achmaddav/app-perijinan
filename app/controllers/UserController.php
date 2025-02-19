@@ -4,13 +4,11 @@ include_once "../app/models/User.php";
 
 class UserController
 {
-    private $db;
     private $user;
 
-    public function __construct()
+    public function __construct($db)
     {
-        $this->db = Database::getInstance()->getConnection();
-        $this->user = new User($this->db);
+        $this->user = new User($db);
     }
 
     public function login()
@@ -41,6 +39,18 @@ class UserController
             }
 
             echo "<script>alert('Login gagal! Periksa email dan password.'); window.location.href='index.php?page=login';</script>";
+            exit();
+        }
+    }
+
+    public function userInfo() {
+        $user = $this->user->getUserById($_SESSION['user_id']);
+        
+        if ($user) {
+            require_once '../app/views/common-users/user_info.php';
+        } else {
+            $_SESSION['error'] = "Info user tidak ditemukan.";
+            header("Location: index.php?page=dashboard");
             exit();
         }
     }

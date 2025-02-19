@@ -24,9 +24,9 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="index.php?page=riwayat_perizinan" class="nav-link text-dark rounded-3">
+                        <a href="index.php?page=status_perizinan" class="nav-link text-dark rounded-3">
                             <i class="nav-icon fas fa-history text-info"></i>
-                            <p>Riwayat Perizinan</p>
+                            <p>Status Perizinan</p>
                         </a>
                     </li>
                 <?php } ?>

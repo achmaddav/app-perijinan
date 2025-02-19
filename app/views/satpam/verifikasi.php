@@ -86,10 +86,6 @@ require_once "../app/models/PerizinanModel.php";
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
-                                    <?php else: ?>
-                                        <tr>
-                                            <td colspan="7" class="text-center text-muted">Tidak ada perizinan yang menunggu persetujuan.</td>
-                                        </tr>
                                     <?php endif; ?>
                                 </tbody>
                             </table>

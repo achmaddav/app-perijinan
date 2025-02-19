@@ -21,6 +21,12 @@ class LogController
         require_once '../app/views/satpam/verifikasi.php';
     }
 
+    public function historyVerify()
+    {
+        $historyList = $this->logKeluarMasuk->getHistoryOutIn();
+        require_once '../app/views/satpam/history_verifikasi.php';
+    }
+
     public function verifyKeluar()
     {
         if (!isset($_SESSION['user_id']) || $_SESSION['jabatan'] !== 'Satpam') {

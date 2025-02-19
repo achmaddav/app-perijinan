@@ -27,7 +27,7 @@ class LaporanController {
 
         // Ambil data laporan perizinan berdasarkan filter dan pagination
         $data = $this->model->getLaporanPerizinan($jabatan, $month_filter, $status_filter, $pemohon_filter, $limit, $offset);
-        $totalData = $this->model->countTotalLaporan($month_filter, $status_filter, $pemohon_filter);
+        $totalData = $this->model->countTotalLaporan($jabatan, $month_filter, $status_filter, $pemohon_filter);
         $totalPages = ceil($totalData / $limit);
         
         // Pastikan halaman tidak melebihi batas total halaman

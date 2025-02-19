@@ -31,11 +31,6 @@ class PerizinanController {
     // Menangani penyimpanan data perizinan
     public function ajukanPerizinan() {
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            if (!isset($_SESSION['user_id'])) {
-                $_SESSION['error'] = "Anda harus login untuk mengajukan perizinan.";
-                header("Location: index.php?page=login");
-                exit();
-            }
 
             $user_id = $_SESSION['user_id'];
             $alasan = trim($_POST['alasan'] ?? '');
@@ -64,22 +59,22 @@ class PerizinanController {
     }
 
     // Menampilkan riwayat perizinan user
-    public function riwayatPerizinan() {
+    public function statusPerizinan() {
         if (!isset($_SESSION['user_id'])) {
             header("Location: index.php?page=login");
             exit();
         }
 
         $user_id = $_SESSION['user_id'];
-        $dataPerizinan = $this->model->getRiwayatPerizinan($user_id);
+        $dataPerizinan = $this->model->getStatusPerizinan($user_id);
 
-        require_once '../app/views/pengaju/riwayat_perizinan.php';
+        require_once '../app/views/pengaju/status_perizinan.php';
     }
 
     public function hapusPerizinan()
     {
         if (!isset($_GET['id'])) {
-            header("Location: index.php?page=riwayat_perizinan&errorMessage=ID tidak valid.");
+            header("Location: index.php?page=status_perizinan&errorMessage=ID tidak valid.");
             exit;
         }
 
@@ -87,19 +82,19 @@ class PerizinanController {
         $status = $this->model->getStatus($id);
 
         if (!$status) {
-            header("Location: index.php?page=riwayat_perizinan&errorMessage=Data tidak ditemukan!");
+            header("Location: index.php?page=status_perizinan&errorMessage=Data tidak ditemukan!");
             exit;
         }
 
         if ($status['status'] === 'Approved' || $status['status'] === 'Rejected') {
-            header("Location: index.php?page=riwayat_perizinan&errorMessage=Data tidak bisa dihapus karena status sudah " . $status['status']);
+            header("Location: index.php?page=status_perizinan&errorMessage=Data tidak bisa dihapus karena status sudah " . $status['status']);
             exit;
         }
 
         if ($this->model->delete($id)) {
-            header("Location: index.php?page=riwayat_perizinan&successMessage=Data berhasil dihapus!");
+            header("Location: index.php?page=status_perizinan&successMessage=Data berhasil dihapus!");
         } else {
-            header("Location: index.php?page=riwayat_perizinan&errorMessage=Gagal menghapus data.");
+            header("Location: index.php?page=status_perizinan&errorMessage=Gagal menghapus data.");
         }
         exit;
     }

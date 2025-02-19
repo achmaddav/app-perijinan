@@ -49,7 +49,7 @@ require_once '../config/database.php';
                 <div class="card shadow-lg border-0">
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table table-hover table-bordered align-middle">
+                            <table class="table table-hover align-middle">
                                 <thead class="table-primary">
                                     <tr class="text-center">
                                         <th>No</th>

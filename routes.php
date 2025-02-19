@@ -15,7 +15,7 @@ function route($conn) {
         'daftar_pegawai',
         'user_detail',
         'ajukan_perizinan',
-        'riwayat_perizinan',
+        'status_perizinan',
         'hapus_perizinan',
         'daftar_perizinan',
         'proses_perizinan',
@@ -23,7 +23,8 @@ function route($conn) {
         'laporan_perizinan',
         'verifikasi',
         'verify_keluar',
-        'verify_masuk'
+        'verify_masuk',
+        'profil'
     ];
 
     // Redirect ke login jika halaman yang diakses butuh autentikasi
@@ -36,13 +37,13 @@ function route($conn) {
     switch ($page) {
         case 'login':
             require_once '../app/controllers/UserController.php';
-            $controller = new UserController();
+            $controller = new UserController($conn);
             $controller->login();
             break;
 
         case 'authenticate':
             require_once '../app/controllers/UserController.php';
-            $controller = new UserController();
+            $controller = new UserController($conn);
             $controller->authenticate();
             break;
 
@@ -77,10 +78,10 @@ function route($conn) {
             }
             break;
 
-        case 'riwayat_perizinan':
+        case 'status_perizinan':
             require_once '../app/controllers/PerizinanController.php';
             $controller = new PerizinanController($conn);
-            $controller->riwayatPerizinan();
+            $controller->statusPerizinan();
             break;
 
         case 'hapus_perizinan':
@@ -125,6 +126,11 @@ function route($conn) {
             require_once '../app/controllers/LogController.php';
             $controller = new LogController($conn);
             $controller->verifyMasuk();
+            break;
+        case 'profil':
+            require_once '../app/controllers/UserController.php';
+            $controller = new UserController($conn);
+            $controller->userInfo();
             break;
 
         default:

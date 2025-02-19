@@ -1,4 +1,6 @@
-<?php include '../app/views/layouts/header.php'; ?>
+<?php 
+include '../app/views/layouts/header.php'; 
+?>
 
 <div class="wrapper">
     <?php include '../app/views/layouts/navbar.php'; ?>
@@ -35,41 +37,51 @@
                                     <tr>
                                         <th>No</th>
                                         <th>Nama Pengaju</th>
+                                        <th>Rencana Tanggal Keluar</th>
                                         <th>Alasan</th>
                                         <th>Status</th>
-                                        <th>Tanggal Pengajuan</th>
-                                        <th>Aksi</th>
+                                        <th>Verifikasi Keluar</th>
+                                        <th>Verifikasi Masuk</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php if (!empty($dataPerizinan)): ?>
-                                        <?php foreach ($dataPerizinan as $index => $izin): ?>
+                                    <?php if (!empty($historyList)): ?>
+                                        <?php foreach ($historyList as $index => $izin): ?>
                                             <tr>
                                                 <td><?= $index + 1; ?></td>
                                                 <td><?= htmlspecialchars($izin['nama_pengaju']); ?></td>
+                                                <td><?= htmlspecialchars($izin['tanggal_rencana_keluar']); ?></td>
                                                 <td><?= htmlspecialchars($izin['alasan']); ?></td>
                                                 <td>
                                                     <?php
                                                         $status = htmlspecialchars($izin['status']);
                                                         $badgeClass = match ($status) {
                                                             'Disetujui' => 'badge bg-success',
-                                                            'Ditolak' => 'badge bg-danger',
-                                                            default => 'badge bg-warning text-dark',
+                                                            'Ditolak'   => 'badge bg-danger',
+                                                            default     => 'badge bg-warning text-dark',
                                                         };
                                                     ?>
                                                     <span class="<?= $badgeClass; ?>"><?= $status; ?></span>
                                                 </td>
-                                                <td><?= htmlspecialchars($izin['created_at']); ?></td>
-                                                <td>
-                                                    <form action="index.php?page=proses_perizinan" method="POST">
-                                                        <input type="hidden" name="id" value="<?= $izin['id']; ?>">
-                                                        <button type="submit" name="status" value="Disetujui" class="btn btn-success btn-sm rounded-pill shadow-sm">
-                                                            <i class="fas fa-check-circle me-1"></i> Setujui
-                                                        </button>
-                                                        <button type="submit" name="status" value="Ditolak" class="btn btn-danger btn-sm rounded-pill shadow-sm">
-                                                            <i class="fas fa-times-circle me-1"></i> Tolak
-                                                        </button>
-                                                    </form>
+                                                <td class="text-center">
+                                                    <?php if (empty($izin['tanggal_keluar'])): ?>
+                                                        <form action="index.php?page=verify_keluar" method="POST">
+                                                            <input type="hidden" name="perizinan_id" value="<?= $izin['id']; ?>">
+                                                            <button type="submit" class="btn btn-warning btn-sm rounded-pill shadow-sm">Verifikasi Keluar</button>
+                                                        </form>
+                                                    <?php else: ?>
+                                                        <span class="badge bg-success">Done</span>
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td class="text-center">
+                                                    <?php if (!empty($izin['tanggal_keluar']) && empty($izin['tanggal_masuk'])): ?>
+                                                        <form action="index.php?page=verify_masuk" method="POST">
+                                                            <input type="hidden" name="perizinan_id" value="<?= $izin['id']; ?>">
+                                                            <button type="submit" class="btn btn-secondary btn-sm rounded-pill shadow-sm">Verifikasi Masuk</button>
+                                                        </form>
+                                                    <?php elseif (!empty($izin['tanggal_keluar']) && !empty($izin['tanggal_masuk'])): ?>
+                                                        <span class="badge bg-success">Done</span>
+                                                    <?php endif; ?>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -91,28 +103,24 @@
     </div>
 </div>
 
+<!-- Custom Styles -->
 <style>
-    /* Hover dan Animasi */
     .table-hover tbody tr:hover {
         background-color: #f8f9fa;
         transition: all 0.3s ease;
     }
-
-    .btn-success:hover, .btn-danger:hover, .btn-outline-primary:hover {
+    .btn-warning:hover, .btn-secondary:hover, .btn-outline-primary:hover {
         transform: translateY(-3px);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         transition: all 0.3s ease;
     }
-
     .alert {
         animation: fadeIn 0.5s, fadeOut 0.5s 3s;
     }
-
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(-10px); }
         to { opacity: 1; transform: translateY(0); }
     }
-
     @keyframes fadeOut {
         from { opacity: 1; transform: translateY(0); }
         to { opacity: 0; transform: translateY(-10px); }
@@ -120,5 +128,3 @@
 </style>
 
 <?php include '../app/views/layouts/footer.php'; ?>
-
-

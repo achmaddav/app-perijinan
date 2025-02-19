@@ -15,7 +15,7 @@
             responsive: true,
             language: {
                 "lengthMenu": "Tampilkan _MENU_ data per halaman",
-                "zeroRecords": "Tidak ada data yang ditemukan",
+                "zeroRecords": "Tidak ada data",
                 "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
                 "infoEmpty": "Tidak ada data yang tersedia",
                 "infoFiltered": "(disaring dari total _MAX_ data)",
@@ -33,11 +33,6 @@
 
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<!-- Dynamic Footer Year -->
-<script>
-    document.getElementById('currentYear').textContent = new Date().getFullYear();
-</script>
 
 <!-- Function: Show Cannot Delete Alert -->
 <script>
@@ -78,6 +73,11 @@
         &copy; <span id="currentYear"></span> Sistem Perizinan. All Rights Reserved.
     </p>
 </footer>
+
+<!-- Dynamic Footer Year -->
+<script>
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+</script>
 
 </body>
 </html>

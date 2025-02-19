@@ -60,10 +60,6 @@
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
-                                    <?php else: ?>
-                                        <tr>
-                                            <td colspan="6" class="text-center text-muted">Tidak ada data pegawai yang ditampilkan.</td>
-                                        </tr>
                                     <?php endif; ?>
                                 </tbody>
                             </table>

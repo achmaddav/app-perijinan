@@ -27,7 +27,7 @@ class PerizinanModel {
     }
 
     // Mengambil riwayat perizinan berdasarkan user_id
-    public function getRiwayatPerizinan($user_id) {
+    public function getStatusPerizinan($user_id) {
         $stmt = $this->conn->prepare("SELECT * FROM perizinan WHERE user_id = ? ORDER BY created_at DESC");
         $stmt->execute([$user_id]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -35,11 +35,6 @@ class PerizinanModel {
 
     // Ambil semua perizinan yang belum diproses oleh atasan
     public function getPendingPerizinan() {
-        if (!isset($_SESSION['user_id'])) {
-            header("Location: index.php?page=login");
-            exit();
-        }
-    
         $user_id = $_SESSION['user_id'];
         $query = "SELECT p.*, u.nama AS nama_pengaju 
                   FROM perizinan p
@@ -67,14 +62,9 @@ class PerizinanModel {
     }
 
     public function getLaporanPerizinan($jabatan, $month, $status, $pemohon, $limit, $offset) {
-        // Pastikan user telah login
-        if (!isset($_SESSION['user_id'])) {
-            header("Location: index.php?page=login");
-            exit();
-        }
         $user_id = $_SESSION['user_id'];
         
-        // Dasar query dan parameter
+        // Dasar query 
         $query = "SELECT 
                     p.id, 
                     u.nama AS nama_pemohon, 
@@ -133,27 +123,28 @@ class PerizinanModel {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-        
-    
-    // Tambahkan metode untuk menghitung total data
-    public function countTotalLaporan($month, $status, $pemohon) {
-        if (!isset($_SESSION['user_id'])) {
-            header("Location: index.php?page=login");
-            exit();
-        }
+            
+    // Metode untuk menghitung total data
+    public function countTotalLaporan($jabatan, $month, $status, $pemohon) {
         $user_id = $_SESSION['user_id'];
         
         $query = "SELECT COUNT(*) 
                   FROM perizinan p
                   JOIN users u ON p.user_id = u.id
                   LEFT JOIN users a ON p.approved_by = a.id
-                  WHERE DATE_FORMAT(p.created_at, '%Y-%m') = :month
-                    AND p.approved_by = :user_id";
+                  WHERE DATE_FORMAT(p.created_at, '%Y-%m') = :month";
+        
+        if ($jabatan === 'Atasan') {
+            $query .= " AND p.approved_by = :user_id";
+        }
         
         $params = [
-            ':month'   => $month,
-            ':user_id' => $user_id
+            ':month' => $month
         ];
+        
+        if ($jabatan === 'Atasan') {
+            $params[':user_id'] = $user_id;
+        }
         
         if (!empty($status)) {
             $query .= " AND p.status = :status";
@@ -176,16 +167,24 @@ class PerizinanModel {
     }
         
     public function getApprovedRequests() {
-        $query = "SELECT p.id, u.nama AS nama_pengaju, p.tanggal_rencana_keluar, 
-                         p.alasan, p.status, l.tanggal_keluar, l.tanggal_masuk
+        $query = "SELECT 
+                    p.id, 
+                    u.nama AS nama_pengaju, 
+                    p.tanggal_rencana_keluar, 
+                    p.alasan, 
+                    p.status, 
+                    l.tanggal_keluar, 
+                    l.tanggal_masuk
                   FROM perizinan p
                   JOIN users u ON p.user_id = u.id
                   LEFT JOIN log_keluar_masuk l ON p.id = l.perizinan_id 
-                  WHERE p.status = 'approved'";
+                  WHERE p.status = 'approved'
+                    AND DATE(p.tanggal_rencana_keluar) = CURDATE()";
+        
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+    }    
 
     // Cek status perizinan berdasarkan ID
     public function getStatus($id)

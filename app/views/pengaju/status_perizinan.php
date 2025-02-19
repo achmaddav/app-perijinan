@@ -8,7 +8,7 @@
     <div class="content-wrapper">
         <div class="content-header">
             <div class="container-fluid">
-                <h2 class="text-center py-3 text-primary">Riwayat Perizinan</h2>
+                <h2 class="text-center py-3 text-primary">Status Perizinan</h2>
 
                 <!-- Notifikasi -->
                 <?php if (isset($_SESSION['success'])): ?>
@@ -75,10 +75,6 @@
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
-                                    <?php else: ?>
-                                        <tr>
-                                            <td colspan="5" class="text-center text-muted">Belum ada riwayat perizinan.</td>
-                                        </tr>
                                     <?php endif; ?>
                                 </tbody>
                             </table>

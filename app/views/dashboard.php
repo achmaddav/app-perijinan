@@ -34,9 +34,9 @@
                     <div class="col-lg-6 mb-4">
                         <div class="card shadow-sm border-0 rounded-4">
                             <div class="card-body">
-                                <h5 class="card-title text-info">Riwayat Perizinan</h5>
+                                <h5 class="card-title text-info">Status Perizinan</h5>
                                 <p class="card-text text-muted">Lihat riwayat perizinan yang telah Anda ajukan.</p>
-                                <a href="index.php?page=riwayat_perizinan" class="btn btn-outline-info rounded-pill">Lihat Riwayat</a>
+                                <a href="index.php?page=status_perizinan" class="btn btn-outline-info rounded-pill">Lihat Status</a>
                             </div>
                         </div>
                     </div>
