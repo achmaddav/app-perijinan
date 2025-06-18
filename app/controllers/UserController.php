@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__ . "/../models/User.php";
 
-
 class UserController
 {
     private $user;
@@ -28,10 +27,15 @@ class UserController
             if ($user) {
                 $hashedPassword = hash('sha256', $password);
                 if ($hashedPassword === $user['password']) {
+                    $mulai_kerja = new DateTime($user['tanggal_mulai_kerja']);
+                    $sekarang = new DateTime();
+                    $diff = $mulai_kerja->diff($sekarang);
+
                     $_SESSION['user_id'] = $user['id'];
                     $_SESSION['nama'] = $user['nama'];
                     $_SESSION['jabatan'] = $user['jabatan'];
                     $_SESSION['nip'] = $user['nip'];
+                    $_SESSION['masa_kerja'] = $diff->y . ' tahun ' . $diff->m . ' bulan';
                     
                     header("Location: dashboard");
                     exit();
@@ -47,7 +51,7 @@ class UserController
         $user = $this->user->getUserById($_SESSION['user_id']);
         
         if ($user) {
-            require_once '../app/views/common-users/user_info.php';
+            require_once __DIR__ . '/../views/common-users/user_info.php';
         } else {
             $_SESSION['error'] = "Info user tidak ditemukan.";
             header("Location: dashboard");

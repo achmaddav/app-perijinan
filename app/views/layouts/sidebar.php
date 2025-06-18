@@ -61,8 +61,36 @@
                 <?php if ($jabatan === 'Satpam') { ?>
                     <li class="nav-item">
                         <a href="/app-perijinan/verifikasi" class="nav-link text-dark rounded-3">
-                            <i class="nav-icon fas fa-user-check text-danger"></i>
+                            <i class="nav-icon fas fa-id-card text-warning"></i>
                             <p>Verifikasi Keluar Masuk</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/app-perijinan/verifikasi_non_perizinan" class="nav-link text-dark rounded-3">
+                            <i class="nav-icon fas fa-user-times text-danger"></i>
+                            <p>Verifikasi Tidak Berizin</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/app-perijinan/history_verify" class="nav-link text-dark rounded-3">
+                            <i class="nav-icon fas fa-shield-alt text-info"></i>
+                            <p>Riwayat Verifikasi</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/app-perijinan/history_verify_non_perizinan" class="nav-link text-dark rounded-3">
+                            <i class="nav-icon fas fa-clipboard-list text-info"></i>
+                            <p>Riwayat Tidak Berizin</p>
+                        </a>
+                    </li>
+                <?php } ?>
+
+                <!-- Menu cuti -->
+                <?php if ($jabatan !== 'Satpam') { ?>
+                    <li class="nav-item">
+                        <a href="/app-perijinan/dashboard_cuti" class="nav-link text-dark rounded-3">
+                            <i class="nav-icon fas fa-clock text-warning"></i>
+                            <p>Cuti</p>
                         </a>
                     </li>
                 <?php } ?>

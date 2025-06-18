@@ -17,7 +17,12 @@ function route($conn) {
         'verifikasi',
         'verify_keluar',
         'verify_masuk',
-        'profil'
+        'history_verify',
+        'verifikasi_non_perizinan',
+        'profil',
+        'leave_history',
+        'proses_approval_cuti',
+        'laporan_cuti'
     ];
 
     // Redirect ke halaman login jika halaman yang diakses butuh autentikasi
@@ -29,19 +34,24 @@ function route($conn) {
 
     // Daftar role yang diperbolehkan untuk masing-masing halaman
     $role_permissions = [
-        'dashboard'             => ['User', 'Atasan', 'SuperUser', 'Satpam'],
-        'daftar_pegawai'        => ['SuperUser'],
-        'user_detail'           => ['SuperUser'],
-        'ajukan_perizinan'      => ['User', 'Atasan'],
-        'status_perizinan'      => ['User', 'Atasan'],
-        'hapus_perizinan'       => ['User', 'Atasan'],
-        'daftar_perizinan'      => ['Atasan', 'SuperUser'],
-        'proses_perizinan'      => ['Atasan', 'SuperUser'],
-        'laporan_perizinan'     => ['Atasan', 'SuperUser'],
-        'verifikasi'            => ['Satpam'],
-        'verify_keluar'         => ['Satpam'],
-        'verify_masuk'          => ['Satpam'],
-        'profil'                => ['User', 'Atasan', 'SuperUser', 'Satpam']
+        'dashboard'                 => ['User', 'Atasan', 'SuperUser', 'Satpam'],
+        'daftar_pegawai'            => ['SuperUser'],
+        'user_detail'               => ['SuperUser'],
+        'ajukan_perizinan'          => ['User', 'Atasan'],
+        'status_perizinan'          => ['User', 'Atasan'],
+        'hapus_perizinan'           => ['User', 'Atasan'],
+        'daftar_perizinan'          => ['Atasan', 'SuperUser'],
+        'proses_perizinan'          => ['Atasan', 'SuperUser'],
+        'laporan_perizinan'         => ['Atasan', 'SuperUser'],
+        'verifikasi'                => ['Satpam'],
+        'verify_keluar'             => ['Satpam'],
+        'verify_masuk'              => ['Satpam'],
+        'verifikasi_non_perizinan'  => ['Satpam'],
+        'history_verify'            => ['Satpam'],
+        'profil'                    => ['User', 'Atasan', 'SuperUser', 'Satpam'],
+        'leave_history'             => ['User', 'Atasan'],
+        'proses_approval_cuti'      => ['SuperUser'],
+        'laporan_cuti'              => ['SuperUser']
     ];
 
     // Jika halaman memiliki batasan role, periksa apakah pengguna memiliki izin
@@ -154,10 +164,96 @@ function route($conn) {
             $controller->verifyMasuk();
             break;
 
+        case 'verifikasi_non_perizinan':
+            require_once __DIR__ . '/app/controllers/LogController.php';
+            $controller = new LogController($conn);
+            $controller->verifyNonPerizinanList();
+            break;
+
+        case 'history_verify':
+            require_once __DIR__ . '/app/controllers/LogController.php';
+            $controller = new LogController($conn);
+            $controller->historyVerify(); 
+            break;
+
         case 'profil':
             require_once __DIR__ . '/app/controllers/UserController.php';
             $controller = new UserController($conn);
             $controller->userInfo();
+            break;
+        
+        case 'tambah_non_perizinan':
+            require_once __DIR__ . '/app/controllers/LogController.php';
+            $controller = new LogController($conn);
+            $controller->verifyNonPerizinan();
+            break;
+        
+        case 'verify_masuk_non_perizinan':
+            require_once __DIR__ . '/app/controllers/LogController.php';
+            $controller = new LogController($conn);
+            $controller->verifyMasukNonPerizinan();
+            break;
+
+        case 'history_verify_non_perizinan':
+            require_once __DIR__ . '/app/controllers/LogController.php';
+            $controller = new LogController($conn);
+            $controller->historyVerifyNonPerizinan(); 
+            break;
+
+        case 'ajukan_cuti':
+            require_once __DIR__ . '/app/controllers/CutiController.php';
+            $controller = new CutiController($conn);
+            $controller->formAjukanCuti();
+            break;
+
+        case 'dashboard_cuti':
+            require_once __DIR__ . '/app/views/cuti/dashboard_cuti.php';
+            break;
+        
+        case 'insert_cuti':
+            require_once __DIR__ . '/app/controllers/CutiController.php';
+            $controller = new CutiController($conn);
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $controller->ajukanCuti();
+            } else {
+                $controller->formAjukanCuti();
+            }
+            break;
+
+        case 'leave_history':
+            require_once __DIR__ . '/app/controllers/CutiController.php';
+            $controller = new CutiController($conn);
+            $controller->leaveHistory();
+            break;
+
+        case 'daftar_pengajuan_cuti':
+            require_once __DIR__ . '/app/controllers/AtasanController.php';
+            $controller = new AtasanController($conn);
+            $controller->daftar_pengajuan_cuti();
+            break;
+
+        case 'proses_approval_cuti':
+            require_once __DIR__ . '/app/controllers/AtasanController.php';
+            $controller = new AtasanController($conn);
+            $controller->proses_approval_cuti();
+            break;
+
+        case 'laporan_cuti':
+            require_once __DIR__ . '/app/controllers/LaporanController.php';
+            $controller = new LaporanController($conn);
+            $controller->laporanCuti();
+            break;
+        
+        case 'cetak_cuti':
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                require_once __DIR__ . '/app/controllers/CutiController.php';
+                $controller = new CutiController($conn);
+                $controller->cetakCuti();
+            } else {
+                require_once __DIR__ . '/app/controllers/LaporanController.php';
+                $controller = new LaporanController($conn);
+                $controller->laporanCuti();
+            }
             break;
 
         default:

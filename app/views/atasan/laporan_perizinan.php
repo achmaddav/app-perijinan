@@ -60,6 +60,7 @@ include __DIR__ . '/../layouts/header.php';
                                         <th>Durasi</th>
                                         <th>Approver</th>
                                         <th>Waktu Pengajuan</th>
+                                        <th>Total Waktu Keluar</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -80,6 +81,7 @@ include __DIR__ . '/../layouts/header.php';
                                             <td><?= htmlspecialchars($row['durasi_keluar']) ?> menit</td>
                                             <td><?= htmlspecialchars($row['nama_atasan'] ?? '-') ?></td>
                                             <td><?= htmlspecialchars($row['created_at']) ?></td>
+                                            <td><?= htmlspecialchars($row['total_waktu_keluar']) ?></td>
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>

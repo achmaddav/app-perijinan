@@ -17,12 +17,23 @@ class PerizinanModel {
     // Menyimpan pengajuan perizinan
     public function insertPerizinan($user_id, $alasan, $tanggal_rencana_keluar, $durasi_keluar, $atasan_id) {
         try {
-            $stmt = $this->conn->prepare("INSERT INTO perizinan (user_id, alasan, status, tanggal_rencana_keluar, durasi_keluar, approved_by, created_at, updated_at) 
-                                          VALUES (?, ?, 'Pending', ?, ?, ?, NOW(), NOW())");
-            $stmt->execute([$user_id, $alasan, $tanggal_rencana_keluar, $durasi_keluar, $atasan_id]);
+            $query = "INSERT INTO perizinan (user_id, alasan, status, tanggal_rencana_keluar, durasi_keluar, approved_by, created_at, updated_at) 
+                    VALUES (:user_id, :alasan, 'Pending', :tanggal_rencana_keluar, :durasi_keluar, :approved_by, NOW(), NOW())";
+
+            $stmt = $this->conn->prepare($query);
+
+            $stmt->execute([
+                ':user_id' => $user_id,
+                ':alasan' => $alasan,
+                ':tanggal_rencana_keluar' => $tanggal_rencana_keluar,
+                ':durasi_keluar' => $durasi_keluar,
+                ':approved_by' => $atasan_id
+            ]);
+
             return true;
         } catch (PDOException $e) {
-            return $e->getMessage();
+            error_log("Insert Perizinan Error: " . $e->getMessage()); // Logging untuk debugging
+            return false; // Hindari mengembalikan pesan error langsung ke frontend
         }
     }
 
@@ -81,10 +92,19 @@ class PerizinanModel {
                     p.tanggal_rencana_keluar, 
                     p.durasi_keluar, 
                     a.nama AS nama_atasan, 
-                    p.created_at 
+                    p.created_at,
+                    CASE 
+                        WHEN SUM(TIMESTAMPDIFF(MINUTE, l.tanggal_keluar, l.tanggal_masuk)) < 60 
+                            THEN CONCAT(SUM(TIMESTAMPDIFF(MINUTE, l.tanggal_keluar, l.tanggal_masuk)), ' menit')
+                        ELSE CONCAT(
+                            FLOOR(SUM(TIMESTAMPDIFF(MINUTE, l.tanggal_keluar, l.tanggal_masuk)) / 60), ' jam ',
+                            MOD(SUM(TIMESTAMPDIFF(MINUTE, l.tanggal_keluar, l.tanggal_masuk)), 60), ' menit'
+                        )
+                    END AS total_waktu_keluar
                   FROM perizinan p
                   JOIN users u ON p.user_id = u.id
                   LEFT JOIN users a ON p.approved_by = a.id
+                  LEFT JOIN log_keluar_masuk AS l ON l.perizinan_id = p.id
                   WHERE DATE_FORMAT(p.created_at, '%Y-%m') = :month";
         
         // Jika jabatan Atasan, filter perizinan yang disetujui oleh user tersebut
@@ -113,13 +133,15 @@ class PerizinanModel {
             $params[':pemohon'] = "%" . $pemohon . "%";
         }
         
+        // Tambahkan GROUP BY karena kita menggunakan fungsi agregat
+        $query .= " GROUP BY p.id";
+        
         $query .= " ORDER BY p.created_at DESC LIMIT :limit OFFSET :offset";
         
         $stmt = $this->conn->prepare($query);
         
         // Bind parameter dinamis
         foreach ($params as $key => $value) {
-            // Tentukan tipe data: integer atau string
             $paramType = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
             $stmt->bindValue($key, $value, $paramType);
         }
@@ -192,7 +214,7 @@ class PerizinanModel {
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }    
+    }
 
     // Cek status perizinan berdasarkan ID
     public function getStatus($id)

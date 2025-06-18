@@ -9,6 +9,30 @@
 <script src="https://cdn.jsdelivr.net/npm/datatables.net-bs5@1.13.4/js/dataTables.bootstrap5.min.js"></script>
 
 <script>
+    function submitFormPDF() {
+        const form = document.getElementById('cetakForm');
+        const formData = new FormData(form);
+
+        const win = window.open('', '_blank'); // buka tab kosong
+
+        fetch(form.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.blob())
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                win.location.href = url;
+            })
+            .catch(err => {
+                win.document.write("Gagal memuat PDF.");
+                console.error(err);
+            });
+    }
+</script>
+
+
+<script>
     $(document).ready(function() {
         // Inisialisasi DataTables dengan pengaturan bahasa
         $('#data-table-perizinan').DataTable({
@@ -31,6 +55,15 @@
     });
 </script>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
+
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -49,19 +82,43 @@
 
 <!-- Modal Konfirmasi Setup -->
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function() {
         let modalKonfirmasi = document.getElementById("modalKonfirmasi");
         if (modalKonfirmasi) {
-            modalKonfirmasi.addEventListener("show.bs.modal", function (event) {
+            modalKonfirmasi.addEventListener("show.bs.modal", function(event) {
                 let button = event.relatedTarget;
+                if (!button) return;
+
                 let id = button.getAttribute("data-id");
                 let alasan = button.getAttribute("data-alasan");
 
                 // Set teks alasan di modal
-                document.getElementById("alasanPerizinan").textContent = alasan;
+                let alasanElem = document.getElementById("alasanPerizinan");
+                if (alasanElem) alasanElem.textContent = alasan;
 
                 // Set link hapus dengan ID yang dipilih
-                document.getElementById("btnHapus").href = "/app-perijinan/hapus_perizinan&id=" + id;
+                let btnHapus = document.getElementById("btnHapus");
+                if (btnHapus) btnHapus.href = "/app-perijinan/hapus_perizinan?id=" + encodeURIComponent(id);
+            });
+        }
+
+        let modalKonfirmasiCuti = document.getElementById("modalKonfirmasiCuti");
+        if (modalKonfirmasiCuti) {
+            modalKonfirmasiCuti.addEventListener("show.bs.modal", function(event) {
+                let button = event.relatedTarget;
+                if (!button) return;
+
+                let id = button.getAttribute("data-id");
+                let fromDate = button.getAttribute("data-fromDate");
+                let tillDate = button.getAttribute("data-tillDate");
+
+                // Set teks tanggal cuti di modal
+                let leaveDateElem = document.getElementById("leaveDate");
+                if (leaveDateElem) leaveDateElem.textContent = fromDate + " sampai tanggal " + tillDate;
+
+                // Set link hapus dengan ID yang dipilih
+                let btnHapus = document.getElementById("btnHapus");
+                if (btnHapus) btnHapus.href = "/app-perijinan/hapus_cuti?id=" + encodeURIComponent(id);
             });
         }
     });
@@ -80,4 +137,5 @@
 </script>
 
 </body>
+
 </html>

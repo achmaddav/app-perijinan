@@ -8,18 +8,35 @@ class LogKeluarMasukModel {
 
     public function insertKeluar($perizinan_id, $satpam_id)
     {
-        $tanggal_keluar = date("Y-m-d H:i:s"); // Set waktu sekarang
-        $sql = "INSERT INTO log_keluar_masuk (perizinan_id, satpam_id, tanggal_keluar) VALUES (?, ?, ?)";
-        $stmt = $this->conn->prepare($sql);
-        return $stmt->execute([$perizinan_id, $satpam_id, $tanggal_keluar]);
+        try {
+            $sql = "INSERT INTO log_keluar_masuk (perizinan_id, satpam_id, tanggal_keluar) VALUES (:perizinan_id, :satpam_id, NOW())";
+            $stmt = $this->conn->prepare($sql);
+            
+            // Bind parameter untuk keamanan
+            $stmt->bindValue(':perizinan_id', (int)$perizinan_id, PDO::PARAM_INT);
+            $stmt->bindValue(':satpam_id', (int)$satpam_id, PDO::PARAM_INT);
+            
+            $stmt->execute();
+
+            // Pastikan data benar-benar tersimpan
+            return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            return $e->getMessage(); // Kembalikan pesan error jika gagal
+        }
     }
 
     public function updateMasuk($id)
     {
-        $tanggal_masuk = date("Y-m-d H:i:s"); // Set waktu sekarang
-        $sql = "UPDATE log_keluar_masuk SET tanggal_masuk = ? WHERE id = ?";
-        $stmt = $this->conn->prepare($sql);
-        return $stmt->execute([$tanggal_masuk, $id]);
+        try {
+            $sql = "UPDATE log_keluar_masuk SET tanggal_masuk = NOW() WHERE id = :id";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindValue(':id', (int)$id, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            return $e->getMessage(); // Kembalikan pesan error jika gagal
+        }        
     }
 
     public function findLogByPerizinanId($perizinan_id)
@@ -37,8 +54,8 @@ class LogKeluarMasukModel {
                     p.tanggal_rencana_keluar, 
                     p.alasan,  
                     us.nama AS nama_satpam,
-                    l.tanggal_keluar, 
-                    l.tanggal_masuk
+                    l.tanggal_keluar AS waktu_keluar, 
+                    l.tanggal_masuk AS waktu_masuk
                   FROM log_keluar_masuk l
                   JOIN perizinan p ON l.perizinan_id = p.id
                   JOIN users us ON l.satpam_id = us.id

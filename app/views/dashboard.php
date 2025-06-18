@@ -79,9 +79,39 @@
                     <div class="col-lg-6 mb-4">
                         <div class="card shadow-sm border-0 rounded-4">
                             <div class="card-body">
-                                <h5 class="card-title text-danger">Verifikasi Keluar Masuk</h5>
+                                <h5 class="card-title text-warning">Verifikasi Keluar Masuk</h5>
                                 <p class="card-text text-muted">Pastikan keabsahan perizinan masuk dan keluar.</p>
-                                <a href="/app-perijinan/verifikasi" class="btn btn-outline-danger rounded-pill">Verifikasi</a>
+                                <a href="/app-perijinan/verifikasi" class="btn btn-outline-warning rounded-pill">Verifikasi</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-6 mb-4">
+                        <div class="card shadow-sm border-0 rounded-4">
+                            <div class="card-body">
+                                <h5 class="card-title text-danger">Verifikasi Tidak  Berizin</h5>
+                                <p class="card-text text-muted">Pastikan keabsahan perizinan masuk dan keluar.</p>
+                                <a href="/app-perijinan/verifikasi_non_perizinan" class="btn btn-outline-danger rounded-pill">Verifikasi</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 mb-4">
+                        <div class="card shadow-sm border-0 rounded-4">
+                            <div class="card-body">
+                                <h5 class="card-title text-info">Riwayat Verifikasi</h5>
+                                <p class="card-text text-muted">Daftar riwayat perizinan yang sudah diverifikasi</p>
+                                <a href="/app-perijinan/history_verify" class="btn btn-outline-info rounded-pill">Lihat Riwayat</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 mb-4">
+                        <div class="card shadow-sm border-0 rounded-4">
+                            <div class="card-body">
+                                <h5 class="card-title text-info">Riwayat Tidak Berizin</h5>
+                                <p class="card-text text-muted">Daftar riwayat tidak berizin</p>
+                                <a href="/app-perijinan/history_verify_non_perizinan" class="btn btn-outline-info rounded-pill">Lihat Riwayat</a>
                             </div>
                         </div>
                     </div>

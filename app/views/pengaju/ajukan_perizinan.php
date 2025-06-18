@@ -40,7 +40,7 @@
 
                                 <form action="/app-perijinan/ajukan_perizinan" method="POST">
                                     <div class="row mb-3">
-                                        <label for="nama_pengaju" class="col-md-4 col-form-label">Nama Pengaju</label>
+                                        <label for="nama_pengaju" class="col-md-4 col-form-label">Nama Pemohon</label>
                                         <div class="col-md-8">
                                             <input type="text" class="form-control shadow-sm" id="nama_pengaju" 
                                                    value="<?= $_SESSION['nama'] ?? 'Guest'; ?>" disabled>
