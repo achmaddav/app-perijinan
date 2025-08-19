@@ -29,6 +29,7 @@ include __DIR__ . '/../layouts/header.php';
                                         <option value="Diajukan" <?= ($status_filter === 'Diajukan') ? 'selected' : '' ?>>Diajukan</option>
                                         <option value="Disetujui" <?= ($status_filter === 'Disetujui') ? 'selected' : '' ?>>Disetujui</option>
                                         <option value="Ditolak" <?= ($status_filter === 'Ditolak') ? 'selected' : '' ?>>Ditolak</option>
+                                        <option value="Progress" <?= ($status_filter === 'Progress') ? 'selected' : '' ?>>Progress (Tahap 1)</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
@@ -61,7 +62,6 @@ include __DIR__ . '/../layouts/header.php';
                                         <th>Approver</th>
                                         <th>Status</th>
                                         <th>Waktu Pengajuan</th>
-                                        <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -78,22 +78,16 @@ include __DIR__ . '/../layouts/header.php';
                                             <!-- <td><?= htmlspecialchars($row['tanggal_selesai']) ?></td> -->
                                             <td><?= htmlspecialchars($row['approver']) ?></td>
                                             <td class="text-center">
-                                                <span class="badge <?= ($row['status'] === 'Diajukan') ? 'bg-warning text-dark' : ($row['status'] === 'Disetujui' ? 'bg-success' : 'bg-danger') ?>">
+                                                <span class="badge 
+                                                    <?= ($row['status'] === 'Diajukan' || $row['status'] === 'Progress') 
+                                                        ? 'bg-warning text-dark' 
+                                                        : ($row['status'] === 'Disetujui' 
+                                                            ? 'bg-success' 
+                                                            : 'bg-danger') ?>">
                                                     <?= htmlspecialchars($row['status']) ?>
                                                 </span>
                                             </td>
                                             <td><?= htmlspecialchars($row['tanggal_pengajuan']) ?></td>
-                                            <td class="text-center">
-                                                <form id="cetakForm" method="POST" action="?page=cetak_cuti">
-                                                    <input type="hidden" name="id" value="<?= $row['id']; ?>">
-                                                    <input type="hidden" name="id" value="<?= $row['id']; ?>">
-                                                    <button type="button" onclick="submitFormPDF()" class="btn btn-primary btn-sm rounded-pill shadow-sm">
-                                                        <i class="fas fa-file-pdf me-1"></i> Cetak
-                                                    </button>
-                                                </form>
-
-                                            </td>
-                                        </tr>
                                     <?php endforeach; ?>
                                 </tbody>
                             </table>

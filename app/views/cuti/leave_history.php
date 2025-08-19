@@ -8,7 +8,7 @@
     <div class="content-wrapper">
         <div class="content-header">
             <div class="container-fluid">
-                <h2 class="text-center py-3 text-primary">Riwayat Cuti</h2>
+                <h2 class="text-center py-3 text-primary">Riwayat & Status Cuti</h2>
 
                 <!-- Notifikasi -->
                 <?php if (isset($_SESSION['success'])): ?>
@@ -37,9 +37,11 @@
                                         <th>Tanggal Mulai Cuti</th>
                                         <th>Tanggal Selai Cuti</th>
                                         <th>Lama Cuti (Hari)</th>
-                                        <th>Approver</th>
+                                        <th>Ketua Tim (Tahap ke-1)</th>
+                                        <th>Kepala Balai (Tahap ke-2)</th>
                                         <th>Status</th>
                                         <th>Aksi</th>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -50,7 +52,8 @@
                                                 <td><?= htmlspecialchars($leave['tanggal_mulai']); ?></td>
                                                 <td><?= htmlspecialchars($leave['tanggal_selesai']); ?></td>
                                                 <td><?= htmlspecialchars($leave['jumlah_cuti']); ?></td>
-                                                <td><?= htmlspecialchars($leave['approver']); ?></td>
+                                                <td><?= htmlspecialchars($leave['tahap_1']); ?></td>
+                                                <td><?= htmlspecialchars($leave['tahap_2']); ?></td>
                                                 <td>
                                                     <?php
                                                         $statusClass = match ($leave['status']) {
@@ -77,6 +80,17 @@
                                                             <i class="fas fa-trash"></i> Hapus
                                                         </button>
                                                     <?php endif; ?>
+                                                </td>
+                                                <td class="text-center">
+                                                    <form id="cetakForm" method="POST" action="?page=cetak_cuti">
+                                                        <input type="hidden" name="id" value="<?= $leave['id']; ?>">
+                                                        
+                                                        <?php if ($leave['status'] === 'Disetujui'): ?>
+                                                            <button type="button" onclick="submitFormPDF()" class="btn btn-primary btn-sm rounded-pill shadow-sm">
+                                                                <i class="fas fa-file-pdf me-1"></i> Cetak
+                                                            </button>
+                                                        <?php endif; ?>
+                                                    </form>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>

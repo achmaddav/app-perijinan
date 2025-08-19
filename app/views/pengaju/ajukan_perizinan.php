@@ -5,13 +5,7 @@
     <?php include __DIR__ . '/../layouts/sidebar.php'; ?>
 
     <div class="content-wrapper">
-        <div class="content-header">
-            <div class="container-fluid">
-                <h2 class="text-center text-primary py-3">Ajukan Perizinan</h2>
-            </div>
-        </div>
-
-        <section class="content">
+        <section class="content py-3">
             <div class="container-fluid">
                 <div class="row justify-content-center">
                     <div class="col-md-8">
@@ -42,42 +36,33 @@
                                     <div class="row mb-3">
                                         <label for="nama_pengaju" class="col-md-4 col-form-label">Nama Pemohon</label>
                                         <div class="col-md-8">
-                                            <input type="text" class="form-control shadow-sm" id="nama_pengaju" 
-                                                   value="<?= $_SESSION['nama'] ?? 'Guest'; ?>" disabled>
+                                            <input type="text" class="form-control shadow-sm" id="nama_pengaju"
+                                                value="<?= $_SESSION['nama'] ?? 'Guest'; ?>" disabled>
                                         </div>
                                     </div>
 
                                     <div class="row mb-3">
                                         <label for="nip" class="col-md-4 col-form-label">NIP</label>
                                         <div class="col-md-8">
-                                            <input type="text" class="form-control shadow-sm" id="nip" 
-                                                   value="<?= $_SESSION['nip'] ?? '-'; ?>" disabled>
+                                            <input type="text" class="form-control shadow-sm" id="nip"
+                                                value="<?= $_SESSION['nip'] ?? '-'; ?>" disabled>
                                         </div>
                                     </div>
 
                                     <div class="row mb-3">
                                         <label for="jabatan" class="col-md-4 col-form-label">Jabatan</label>
                                         <div class="col-md-8">
-                                            <input type="text" class="form-control shadow-sm" id="jabatan" 
-                                                   value="<?= $_SESSION['jabatan'] ?? '-'; ?>" disabled>
+                                            <input type="text" class="form-control shadow-sm" id="jabatan"
+                                                value="<?= htmlspecialchars($jabatan_user['nama'] . ' ' . $_SESSION['divisi']) ?>" disabled>
                                         </div>
                                     </div>
 
-                                    <div class="row mb-3">
-                                        <label for="atasan" class="col-md-4 col-form-label">Pilih Atasan</label>
+                                    <div class="row mb-3 align-items-center">
+                                        <label for="atasan" class="col-md-4 col-form-label">Atasan</label>
                                         <div class="col-md-8">
-                                            <select class="form-select shadow-sm" id="atasan" name="atasan" required>
-                                                <option value="">-- Pilih Atasan --</option>
-                                                <?php if (!empty($atasanList)) { ?>
-                                                    <?php foreach ($atasanList as $atasan) { ?>
-                                                        <option value="<?= htmlspecialchars($atasan['id']); ?>">
-                                                            <?= htmlspecialchars($atasan['nama']); ?>
-                                                        </option>
-                                                    <?php } ?>
-                                                <?php } else { ?>
-                                                    <option value="">Tidak ada atasan tersedia</option>
-                                                <?php } ?>
-                                            </select>
+                                            <input type="text" class="form-control shadow-sm" id="nama_atasan"
+                                                value="<?= htmlspecialchars($atasan['nama']); ?>" disabled>
+                                            <input type="hidden" name="atasan" id="atasan" value="<?= htmlspecialchars($atasan['id']); ?>">
                                         </div>
                                     </div>
 
@@ -89,7 +74,7 @@
                                     </div>
 
                                     <div class="row mb-3">
-                                        <label for="durasi" class="col-md-4 col-form-label">Durasi Keluar (Menit)</label>
+                                        <label for="durasi" class="col-md-4 col-form-label">Durasi Keluar (Jam)</label>
                                         <div class="col-md-8">
                                             <input type="number" class="form-control shadow-sm" id="durasi" name="durasi" required>
                                         </div>
@@ -122,7 +107,9 @@
 </div>
 
 <style>
-    .btn-danger:hover, .btn-outline-primary:hover, .btn-outline-success:hover {
+    .btn-danger:hover,
+    .btn-outline-primary:hover,
+    .btn-outline-success:hover {
         transform: translateY(-3px);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         transition: all 0.3s ease;

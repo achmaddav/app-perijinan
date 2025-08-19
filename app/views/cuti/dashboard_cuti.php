@@ -21,7 +21,7 @@
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
-                <?php if ($jabatan === 'User' || $jabatan === 'Atasan') { ?>
+                <?php if ($jabatan === 'STF' || $jabatan === 'KTA') { ?>
                     <div class="col-lg-6 mb-4">
                         <div class="card shadow-sm border-0 rounded-4">
                             <div class="card-body">
@@ -34,7 +34,7 @@
                     <div class="col-lg-6 mb-4">
                         <div class="card shadow-sm border-0 rounded-4">
                             <div class="card-body">
-                                <h5 class="card-title text-info">Riwayat Cuti</h5>
+                                <h5 class="card-title text-info">Riwayat & Status Cuti</h5>
                                 <p class="card-text text-muted">Lihat riwayat cuti yang telah Anda ajukan.</p>
                                 <a href="/app-perijinan/leave_history" class="btn btn-outline-info rounded-pill">Lihat Riwayat</a>
                             </div>
@@ -42,7 +42,7 @@
                     </div>
                 <?php } ?>
 
-                <?php if ($jabatan === 'SuperUser') { ?>
+                <?php if ($jabatan === 'KEP' || $jabatan === 'KTA') { ?>
                     <div class="col-lg-6 mb-4">
                         <div class="card shadow-sm border-0 rounded-4">
                             <div class="card-body">

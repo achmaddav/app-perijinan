@@ -19,10 +19,10 @@ class UserController
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             session_start();
-            $email = trim($_POST['email']);
+            $nip = trim($_POST['nip']);
             $password = $_POST['password'];
 
-            $user = $this->user->findByEmail($email);
+            $user = $this->user->findByNip($nip);
 
             if ($user) {
                 $hashedPassword = hash('sha256', $password);
@@ -31,10 +31,16 @@ class UserController
                     $sekarang = new DateTime();
                     $diff = $mulai_kerja->diff($sekarang);
 
+
+
                     $_SESSION['user_id'] = $user['id'];
                     $_SESSION['nama'] = $user['nama'];
-                    $_SESSION['jabatan'] = $user['jabatan'];
+                    $_SESSION['jabatan'] = $user['kode_jabatan'];
+                    $_SESSION['kepala_balai'] = $user['kepala_id'];
+                    $_SESSION['atasan'] = $user['atasan_id'];
+                    $_SESSION['divisi'] = $user['divisi'];
                     $_SESSION['nip'] = $user['nip'];
+                    $_SESSION['email'] = $user['email'];
                     $_SESSION['masa_kerja'] = $diff->y . ' tahun ' . $diff->m . ' bulan';
                     
                     header("Location: dashboard");
@@ -42,7 +48,7 @@ class UserController
                 }
             }
 
-            echo "<script>alert('Login gagal! Periksa email dan password.'); window.location.href='login';</script>";
+            echo "<script>alert('Login gagal! Periksa nip dan password.'); window.location.href='login';</script>";
             exit();
         }
     }

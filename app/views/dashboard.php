@@ -21,7 +21,7 @@
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
-                <?php if ($jabatan === 'User' || $jabatan === 'Atasan') { ?>
+                <?php if ($jabatan === 'STF' || $jabatan === 'KTA') { ?>
                     <div class="col-lg-6 mb-4">
                         <div class="card shadow-sm border-0 rounded-4">
                             <div class="card-body">
@@ -42,7 +42,7 @@
                     </div>
                 <?php } ?>
 
-                <?php if ($jabatan === 'SuperUser') { ?>
+                <?php if ($jabatan === 'KEP') { ?>
                     <div class="col-lg-6 mb-4">
                         <div class="card shadow-sm border-0 rounded-4">
                             <div class="card-body">
@@ -54,7 +54,7 @@
                     </div>
                 <?php } ?>
 
-                <?php if ($jabatan === 'Atasan' || $jabatan === 'SuperUser') { ?>
+                <?php if ($jabatan === 'KTA' || $jabatan === 'KEP') { ?>
                     <div class="col-lg-6 mb-4">
                         <div class="card shadow-sm border-0 rounded-4">
                             <div class="card-body">
@@ -75,7 +75,7 @@
                     </div>
                 <?php } ?>
 
-                <?php if ($jabatan === 'Satpam') { ?>
+                <?php if ($jabatan === 'SCT') { ?>
                     <div class="col-lg-6 mb-4">
                         <div class="card shadow-sm border-0 rounded-4">
                             <div class="card-body">

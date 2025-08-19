@@ -40,7 +40,7 @@ class LogController
 
     public function verifyKeluar()
     {
-        if (!isset($_SESSION['user_id']) || $_SESSION['jabatan'] !== 'Satpam') {
+        if (!isset($_SESSION['user_id']) || $_SESSION['jabatan'] !== 'SCT') {
             header("Location: dashboard");
             exit();
         }
@@ -62,7 +62,7 @@ class LogController
 
     public function verifyMasuk()
     {
-        if (!isset($_SESSION['user_id']) || $_SESSION['jabatan'] !== 'Satpam') {
+        if (!isset($_SESSION['user_id']) || $_SESSION['jabatan'] !== 'SCT') {
             header("Location: dashboard");
             exit();
         }
@@ -72,7 +72,7 @@ class LogController
             $log = $this->logKeluarMasuk->findLogByPerizinanId($perizinan_id);
 
             if ($log) {
-                if ($this->logKeluarMasuk->updateMasuk($log['id'])) {
+                if ($this->logKeluarMasuk->updateMasuk($log['id'])) { 
                     $_SESSION['success'] = "Verifikasi masuk berhasil.";
                 } else {
                     $_SESSION['error'] = "Terjadi kesalahan saat verifikasi masuk.";
@@ -91,9 +91,9 @@ class LogController
             // Validasi input
             $user_id = isset($_POST['user_id']) ? htmlspecialchars($_POST['user_id']) : null;
             $satpam_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
-            $waktu_keluar = isset($_POST['waktu_keluar']) ? htmlspecialchars($_POST['waktu_keluar']) : null;
+            $waktu_keluar = (new DateTime())->format('Y-m-d H:i:s');
     
-            if (!$user_id || !$waktu_keluar) {
+            if (!$user_id) {
                 $_SESSION['error'] = "Semua field harus diisi.";
                 header("Location: verifikasi_non_perizinan");
                 exit();
@@ -116,7 +116,7 @@ class LogController
 
     public function verifyMasukNonPerizinan()
     {
-        if (!isset($_SESSION['user_id']) || $_SESSION['jabatan'] !== 'Satpam') {
+        if (!isset($_SESSION['user_id']) || $_SESSION['jabatan'] !== 'SCT') {
             header("Location: dashboard");
             exit();
         }

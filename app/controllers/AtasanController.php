@@ -73,23 +73,37 @@ class AtasanController {
     }
 
     public function daftar_pengajuan_cuti() {
-        $daftarPengajuanCuti = $this->cutiModel->getPengajuanCuti(); 
+        $jabatan = $_SESSION['jabatan'] ?? null;
+
+        if ($jabatan === "KTA") {
+            $daftarPengajuanCuti = $this->cutiModel->getPengajuanCuti(); 
+        } else {
+            $daftarPengajuanCuti = $this->cutiModel->getPengajuanCutiForHeadOffice();
+        }
+
         require_once __DIR__ . '/../views/atasan/daftar_pengajuan_cuti.php';
     }
 
-    // Atasan menyetujui atau menolak cuti
     public function proses_approval_cuti() {
         if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['id'], $_POST['status'])) {
             $id = $_POST['id'];
             $status = $_POST['status'];
             $approved_by = $_SESSION['user_id'];
-    
-            if ($this->cutiModel->updateStatus($id, $status, $approved_by)) {
-                $_SESSION['success'] = "Cuti berhasil diperbarui.";
+            
+            if ($_SESSION['jabatan'] == "KTA") {
+                if ($this->cutiModel->updateStatus($id, $status, $approved_by)) {
+                    $_SESSION['success'] = "Cuti berhasil diperbarui.";
+                } else {
+                    $_SESSION['error'] = "Terjadi kesalahan saat menyetujui cuti.";
+                }
             } else {
-                $_SESSION['error'] = "Terjadi kesalahan saat memperbarui cuti.";
+                if ($this->cutiModel->updateStatusByHeadOffice($id, $status, $approved_by)) {
+                    $_SESSION['success'] = "Cuti berhasil diperbarui.";
+                } else {
+                    $_SESSION['error'] = "Terjadi kesalahan saat menyetujui cuti.";
+                }
             }
-    
+            
             header("Location: daftar_pengajuan_cuti");
             exit();
         }

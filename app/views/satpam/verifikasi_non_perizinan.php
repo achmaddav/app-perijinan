@@ -44,7 +44,7 @@ include __DIR__ . '/../layouts/header.php';
                                 <thead class="table-primary">
                                     <tr>
                                         <th>No</th>
-                                        <th>Nama Pengaju</th>
+                                        <th>Nama Pemohon</th>
                                         <th>Verifikasi Keluar</th>
                                         <th>Verifikasi Masuk</th>
                                     </tr>
@@ -109,10 +109,6 @@ include __DIR__ . '/../layouts/header.php';
                                 </option>
                             <?php endforeach; ?>
                         </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="waktu_keluar" class="form-label">Tanggal Keluar</label>
-                        <input type="datetime-local" name="waktu_keluar" id="waktu_keluar" class="form-control" required>
                     </div>
                 </div>
                 <div class="modal-footer border-0">

@@ -14,6 +14,20 @@ class PerizinanModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getAtasanLimit($jabatan) {
+        $stmt = $this->conn->prepare("
+            SELECT u.id, u.nama
+            FROM users u
+            INNER JOIN jabatan j ON u.jabatan_id = j.id
+            WHERE j.nama = :jabatan
+            ORDER BY u.tanggal_mulai_kerja ASC
+            LIMIT 1
+        ");
+        $stmt->bindParam(':jabatan', $jabatan, PDO::PARAM_STR);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     // Menyimpan pengajuan perizinan
     public function insertPerizinan($user_id, $alasan, $tanggal_rencana_keluar, $durasi_keluar, $atasan_id) {
         try {
@@ -80,8 +94,7 @@ class PerizinanModel {
         return $stmt->execute();    
     }
 
-    public function getLaporanPerizinan($jabatan, $month, $status, $pemohon, $limit, $offset) {
-        $user_id = $_SESSION['user_id'];
+    public function getLaporanPerizinan($user_id, $jabatan, $month, $status, $pemohon, $limit, $offset) {
         
         // Dasar query 
         $query = "SELECT 
@@ -108,7 +121,7 @@ class PerizinanModel {
                   WHERE DATE_FORMAT(p.created_at, '%Y-%m') = :month";
         
         // Jika jabatan Atasan, filter perizinan yang disetujui oleh user tersebut
-        if ($jabatan === 'Atasan') {
+        if ($jabatan !== 'KEP') {
             $query .= " AND p.approved_by = :user_id";
         }
         
@@ -117,7 +130,7 @@ class PerizinanModel {
             ':month' => $month
         ];
         
-        if ($jabatan === 'Atasan') {
+        if ($jabatan !== 'KEP') {
             $params[':user_id'] = $user_id;
         }
         
@@ -155,16 +168,14 @@ class PerizinanModel {
     }
             
     // Metode untuk menghitung total data
-    public function countTotalLaporan($jabatan, $month, $status, $pemohon) {
-        $user_id = $_SESSION['user_id'];
-        
+    public function countTotalLaporan($user_id, $jabatan, $month, $status, $pemohon) {
         $query = "SELECT COUNT(*) 
                   FROM perizinan p
                   JOIN users u ON p.user_id = u.id
                   LEFT JOIN users a ON p.approved_by = a.id
                   WHERE DATE_FORMAT(p.created_at, '%Y-%m') = :month";
         
-        if ($jabatan === 'Atasan') {
+        if ($jabatan !== 'KEP') {
             $query .= " AND p.approved_by = :user_id";
         }
         
@@ -172,7 +183,7 @@ class PerizinanModel {
             ':month' => $month
         ];
         
-        if ($jabatan === 'Atasan') {
+        if ($jabatan !== 'KEP') {
             $params[':user_id'] = $user_id;
         }
         
@@ -211,6 +222,21 @@ class PerizinanModel {
                   WHERE p.status = 'approved'
                     AND DATE(p.tanggal_rencana_keluar) = CURDATE()";
         
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getNonPerizinanRequests() {        
+        $query = "SELECT 
+                    l.id, 
+                    u.nama AS nama_pengaju, 
+                    l.tanggal_keluar, 
+                    l.tanggal_masuk
+                  FROM log_keluar_masuk_non_perizinan l
+                  JOIN users u ON l.user_id = u.id
+                  WHERE DATE(l.created_at) = CURDATE()";
+
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);

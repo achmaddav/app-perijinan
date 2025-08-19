@@ -34,24 +34,24 @@ function route($conn) {
 
     // Daftar role yang diperbolehkan untuk masing-masing halaman
     $role_permissions = [
-        'dashboard'                 => ['User', 'Atasan', 'SuperUser', 'Satpam'],
-        'daftar_pegawai'            => ['SuperUser'],
-        'user_detail'               => ['SuperUser'],
-        'ajukan_perizinan'          => ['User', 'Atasan'],
-        'status_perizinan'          => ['User', 'Atasan'],
-        'hapus_perizinan'           => ['User', 'Atasan'],
-        'daftar_perizinan'          => ['Atasan', 'SuperUser'],
-        'proses_perizinan'          => ['Atasan', 'SuperUser'],
-        'laporan_perizinan'         => ['Atasan', 'SuperUser'],
-        'verifikasi'                => ['Satpam'],
-        'verify_keluar'             => ['Satpam'],
-        'verify_masuk'              => ['Satpam'],
-        'verifikasi_non_perizinan'  => ['Satpam'],
-        'history_verify'            => ['Satpam'],
-        'profil'                    => ['User', 'Atasan', 'SuperUser', 'Satpam'],
-        'leave_history'             => ['User', 'Atasan'],
-        'proses_approval_cuti'      => ['SuperUser'],
-        'laporan_cuti'              => ['SuperUser']
+        'dashboard'                 => ['STF', 'KTA', 'KEP', 'SCT'],
+        'daftar_pegawai'            => ['KEP'],
+        'user_detail'               => ['KEP'],
+        'ajukan_perizinan'          => ['STF', 'KTA'],
+        'status_perizinan'          => ['STF', 'KTA'],
+        'hapus_perizinan'           => ['STF', 'KTA'],
+        'daftar_perizinan'          => ['KTA', 'KEP'],
+        'proses_perizinan'          => ['KTA', 'KEP'],
+        'laporan_perizinan'         => ['KTA', 'KEP'],
+        'verifikasi'                => ['SCT'],
+        'verify_keluar'             => ['SCT'],
+        'verify_masuk'              => ['SCT'],
+        'verifikasi_non_perizinan'  => ['SCT'],
+        'history_verify'            => ['SCT'],
+        'profil'                    => ['STF', 'KTA', 'KEP', 'SCT'],
+        'leave_history'             => ['STF', 'KTA'],
+        'proses_approval_cuti'      => ['KEP', 'KTA'],
+        'laporan_cuti'              => ['KEP', 'KTA']
     ];
 
     // Jika halaman memiliki batasan role, periksa apakah pengguna memiliki izin
@@ -254,6 +254,12 @@ function route($conn) {
                 $controller = new LaporanController($conn);
                 $controller->laporanCuti();
             }
+            break;
+
+        case 'hapus_cuti':
+            require_once __DIR__ . '/app/controllers/CutiController.php';
+            $controller = new CutiController($conn);
+            $controller->hapusCuti();
             break;
 
         default:

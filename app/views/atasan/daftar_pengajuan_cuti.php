@@ -55,9 +55,15 @@
                                                 <td>
                                                     <form action="/app-perijinan/proses_approval_cuti" method="POST">
                                                         <input type="hidden" name="id" value="<?= $cuti['id']; ?>">
-                                                        <button type="submit" name="status" value="Disetujui" class="btn btn-success btn-sm rounded-pill shadow-sm">
-                                                            <i class="fas fa-check-circle me-1"></i> Setujui
-                                                        </button>
+                                                        <?php if ($jabatan === 'KTA'): ?>
+                                                            <button type="submit" name="status" value="Progress" class="btn btn-success btn-sm rounded-pill shadow-sm">
+                                                                <i class="fas fa-check-circle me-1"></i> Setujui
+                                                            </button>
+                                                        <?php else: ?>
+                                                            <button type="submit" name="status" value="Disetujui" class="btn btn-success btn-sm rounded-pill shadow-sm">
+                                                                <i class="fas fa-check-circle me-1"></i> Setujui
+                                                            </button>
+                                                        <?php endif; ?>
                                                         <button type="submit" name="status" value="Ditolak" class="btn btn-danger btn-sm rounded-pill shadow-sm">
                                                             <i class="fas fa-times-circle me-1"></i> Tolak
                                                         </button>

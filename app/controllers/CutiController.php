@@ -2,6 +2,8 @@
 require_once __DIR__ . '/../models/CutiModel.php';
 require_once __DIR__ . '/../models/PerizinanModel.php';
 require_once __DIR__ . '/../models/TipeCutiModel.php';
+require_once __DIR__ . '/../models/User.php';
+require_once __DIR__ . '/../models/JabatanModel.php';
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 use Dompdf\Dompdf;
@@ -12,28 +14,51 @@ class CutiController
     private $cutiModel;
     private $perizinanModel;
     private $tipeCutiModel;
+    private $modelUser;
+    private $modelJabatan;
 
     public function __construct($db)
     {
         $this->cutiModel = new CutiModel($db);
         $this->perizinanModel = new PerizinanModel($db);
         $this->tipeCutiModel = new TipeCutiModel($db);
+        $this->modelUser = new User($db);
+        $this->modelJabatan = new JabatanModel($db);
     }
 
     public function formAjukanCuti()
     {
         if (!isset($_SESSION['user_id'])) {
             header("Location: login");
-            exit();
+            exit;
         }
 
-        $jabatan = $_SESSION['jabatan'] ?? '';
-        $atasanList = $this->perizinanModel->getAtasanList('SuperUser');
+        $user_id = $_SESSION['user_id'];
+        $kodeJabatan = $_SESSION['jabatan'];
+        $kepala_id = $_SESSION['kepala_balai'];
+        $ketua_id = $_SESSION['atasan'];
+
+        $jabatan_user = $this->modelJabatan->getNamaJabatanByKode($kodeJabatan);
+        $kepala_balai = $this->modelUser->getKepalaBalaiById($kepala_id);
+        $ketua_tim = $this->modelUser->getKetuaTimById($ketua_id);
+        
+        if (!$kepala_balai) {
+            die("Data kepala balai tidak ditemukan. Hubungi admin.");
+        }
+
+        if (!$ketua_tim) {
+            die("Data ketua tim tidak ditemukan. Hubungi admin.");
+        }
+
         $tipeCutiList = $this->tipeCutiModel->getTipeCutiList();
+        if (!$tipeCutiList) {
+            die("Tipe cuti tidak tersedia. Hubungi admin.");
+        }
+
+        $sisaCuti = $this->cutiModel->getLeaveRemaining($user_id);
 
         require_once __DIR__ . '/../views/cuti/create_cuti.php';
     }
-
 
     public function ajukanCuti()
     {
@@ -42,11 +67,17 @@ class CutiController
             $user_id = $_SESSION['user_id'];
             $jenis_cuti_id = $_POST['tipeCuti'];
             $atasan_id = $_POST['atasan'];
+            $ketua_id = $_POST['ketua'];
             $from_date = $_POST['dari_tanggal'];
             $to_date = $_POST['sampai_tanggal'];
+            $alamat = $_POST['alamat'];
             $deskripsi = $_POST['deskripsi'];
+            $jabatan = $_SESSION['jabatan'];
 
-            $result = $this->cutiModel->insertCuti($user_id, $jenis_cuti_id, $atasan_id, $from_date, $to_date, $deskripsi);
+            $result = $this->cutiModel->insertCuti(
+                $user_id, $jenis_cuti_id, $atasan_id, 
+                $ketua_id, $from_date, $to_date, $alamat, 
+                $deskripsi, $jabatan);
 
             if ($result === true) {
                 $_SESSION['success'] = "Pengajuan cuti berhasil dikirim.";
@@ -73,6 +104,11 @@ class CutiController
         require_once __DIR__ . '/../views/cuti/leave_history.php';
     }
 
+    private function cmToPt($cm)
+    {
+        return $cm * 28.35;
+    }
+
     public function cetakCuti()
     {
         if (!isset($_POST['id'])) {
@@ -82,7 +118,6 @@ class CutiController
 
         $id = $_POST['id'];
 
-        // Ambil data cuti dari database
         $cuti = $this->cutiModel->getCutiById($id);
 
         if (!$cuti) {
@@ -90,16 +125,21 @@ class CutiController
             exit;
         }
 
-        // Render HTML ke PDF
         $html = $this->exportCutiPdf($cuti);
 
-        $options = new Options();
+        $options = new \Dompdf\Options();
+        $options->set('isRemoteEnabled', true); 
         $options->set('isHtml5ParserEnabled', true);
         $options->set('defaultFont', 'Helvetica');
 
-        $dompdf = new Dompdf($options);
+        $dompdf = new \Dompdf\Dompdf($options);
         $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4', 'portrait');
+
+        // Custom ukuran kertas dalam cm
+        $width = $this->cmToPt(15);   
+        $height = $this->cmToPt(25);  
+        $dompdf->setPaper([0, 0, $width, $height]);
+
         $dompdf->render();
         $dompdf->stream("Formulir_Cuti_{$cuti['id']}.pdf", ["Attachment" => true]);
     }
@@ -115,6 +155,17 @@ class CutiController
             'dd MMMM yyyy'
         );
         $tanggalMulaiFormatted = $formatter->format(new DateTime($cuti['tanggal_mulai']));
+        $tanggalPengajuan = $formatter->format(new DateTime($cuti['created_at']));
+
+        // $logoPath = $_SERVER['DOCUMENT_ROOT'] . "/app-perijinan/assets/image/logo.png";
+        // $logoPath = 'file://' . realpath($logoPath);
+
+        $logoPath = $_SERVER['DOCUMENT_ROOT'] . "/app-perijinan/assets/image/logo.png";
+        $type = pathinfo($logoPath, PATHINFO_EXTENSION);
+        $data = file_get_contents($logoPath);
+        $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+
+
         ob_start();
     ?>
         <html>
@@ -127,31 +178,57 @@ class CutiController
                 body {
                     font-family: Arial, sans-serif;
                     margin: 0;
-                    padding: 20px;
+                    padding: 15px;
                     font-size: 14px;
                 }
+
+                .header-container {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    position: relative;
+                    padding: 10px 20px;
+                }
+
+                .logo {
+                    position: absolute;
+                    left: 20px;
+                    width: 70px;
+                    height: auto;
+                }
+
+                .header-text {
+                    text-align: center;
+                    color: #1F9CF0;
+                    font-size: 10pt;
+                    line-height: 1.4;
+                }
+
+                /* .header-text .ministry {
+                    font-weight: bold;
+                } */
 
                 .header {
                     text-align: center;
                     margin-bottom: 2px;
-                    padding-bottom: 10px;
+                    padding-bottom: 5px;
                 }
 
                 .ministry {
-                    font-size: 16px;
+                    font-size: 12px;
                 }
 
                 .directorate {
-                    font-size: 14px;
+                    font-size: 13px;
                 }
 
                 .office {
-                    font-size: 13px;
+                    font-size: 14px;
                     margin-top: 5px;
                 }
 
                 .contact {
-                    font-size: 12px;
+                    font-size: 10px;
                     margin-top: 5px;
                 }
 
@@ -204,7 +281,7 @@ class CutiController
                 table {
                     width: 100%;
                     border-collapse: collapse;
-                    margin-bottom: 20px;
+                    margin-bottom: 15px;
                 }
 
                 table,
@@ -236,12 +313,17 @@ class CutiController
         </head>
 
         <body> 
-            <div class="header" style="color: #1F9CF0; font-size: 10pt; padding: 0px; padding-left: 2px;">
-                <div class="ministry">KEMENTERIAN PERTANIAN</div>
-                <div class="directorate">DIREKTORAT JENDERAL PETERNAKAN DAN KESEHATAN HEWAN</div>
-                <div class="office">BALAI PEMBIBITAN TERNAK UNGGUL DAN HIJAUAN PAKAN TERNAK SEMBAWA</div>
-                <div class="contact">JALAN RAYA PALEMBANG-PANOKALAN BALAI KILYIP SEMBAWA KOTAK POS 1118 PALEMBANG 30691<br>
-                    TELEPON (011) 7853010 e-33a1 Eprint:http://yahoo.com/Web1 / www.bjpti-sembawa</div>
+            <div class="header-container">
+                <img src="<?= $base64 ?>" class="logo" alt="Logo"> 
+                <div class="header-text">
+                    <div class="ministry">KEMENTERIAN PERTANIAN</div>
+                    <div class="directorate">DIREKTORAT JENDERAL PETERNAKAN DAN KESEHATAN HEWAN</div>
+                    <div class="office">BALAI PEMBIBITAN TERNAK UNGGUL DAN HIJAUAN PAKAN TERNAK SEMBAWA</div>
+                    <div class="contact">
+                        JALAN RAYA PALEMBANG-PANGKALAN BALAI KM.20 SEMBAWA KOTAK POS 1116 PALEMBANG 30001<br>
+                        TELEPON (0711) 7853010 &nbsp;&nbsp; e-Mail: bptuhptsembawa@yahoo.com &nbsp;&nbsp; Web: www.bptuhpt-sembawa
+                    </div>
+                </div>
             </div>
 
             <div style="border-bottom: 2px solid black; margin-bottom: 2px;"></div>
@@ -258,8 +340,8 @@ class CutiController
                 </div>
                 
                 <div class="regulation-box-address" style="margin-top: 5px;">
-                    Sembawa,<br>
-                    Kepala<br>
+                    Sembawa, <?= htmlspecialchars($tanggalPengajuan); ?><br>
+                    Kepada,<br>
                     Yth. Kepala BPTU-HPT Sembawa<br>
                     di Tempat
                 </div>
@@ -295,21 +377,33 @@ class CutiController
                 </tr>
                 <tr>
                     <td style="font-size: 8pt; padding: 0px; padding-left: 2px;">1. Cuti Tahunan</td>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;"></td>
+                    <td style="text-align: center; font-size: 10pt; padding: 2px;">
+                        <?= $cuti['kode_cuti'] === 'CT' ? 'v' : '-'; ?>
+                    </td>
                     <td style="font-size: 8pt; padding: 0px; padding-left: 2px;">2. Cuti Besar</td>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;"></td>
+                    <td style="text-align: center; font-size: 10pt; padding: 2px;">
+                        <?= $cuti['kode_cuti'] === 'CB' ? 'v' : '-'; ?>
+                    </td>
                 </tr>
                 <tr>
                     <td style="font-size: 8pt; padding: 0px; padding-left: 2px;">3. Cuti Sakit</td>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;"></td>
+                    <td style="text-align: center; font-size: 10pt; padding: 2px;">
+                        <?= $cuti['kode_cuti'] === 'CS' ? 'v' : '-'; ?>
+                    </td>
                     <td style="font-size: 8pt; padding: 0px; padding-left: 2px;">4. Cuti Melahirkan</td>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;"></td>
+                    <td style="text-align: center; font-size: 10pt; padding: 2px;">
+                        <?= $cuti['kode_cuti'] === 'CM' ? 'v' : '-'; ?>
+                    </td>
                 </tr>
                 <tr>
                     <td style="font-size: 8pt; padding: 0px; padding-left: 2px;">5. Cuti Karena Alasan Penting</td>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;"></td>
+                    <td style="text-align: center; font-size: 10pt; padding: 2px;">
+                        <?= $cuti['kode_cuti'] === 'CKAP' ? 'v' : '-'; ?>
+                    </td>
                     <td style="font-size: 8pt; padding: 0px; padding-left: 2px;">6. Cuti di Luar Tanggungan Negara</td>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;"></td>
+                    <td style="text-align: center; font-size: 10pt; padding: 2px;">
+                        <?= $cuti['kode_cuti'] === 'CLTN' ? 'v' : '-'; ?>
+                    </td>
                 </tr>
             </table>
 
@@ -379,8 +473,10 @@ class CutiController
                 </tr>
                 <tr style="height: 100px;">
                     <!-- Alamat panjang -->
-                    <td rowspan="2" colspan="2" style="vertical-align: top; width: 50%; font-size: 8pt; padding: 0px; padding-left: 2px;"></td>
-                    
+                    <td rowspan="2" colspan="2" style="text-align: center; vertical-align: middle; width: 50%; font-size: 8pt; padding: 0px; padding-left: 2px;">
+                        <?= htmlspecialchars($cuti['alamat']); ?>
+                    </td>
+
                     <!-- TELP -->
                     <td style="width: 10%; vertical-align: top; font-size: 8pt; padding: 0px; padding-left: 2px;">TELP</td>
                     <td style="width: 40%; vertical-align: top; font-size: 8pt; padding: 0px; padding-left: 2px;">&nbsp;</td>
@@ -409,10 +505,14 @@ class CutiController
 
                 <!-- Tanda centang -->
                 <tr>
+                    <td style="text-align: center; font-size: 10pt; padding: 2px;">
+                        <?= $cuti['status'] === 'Disetujui' ? 'v' : '-'; ?>
+                    </td>
                     <td style="text-align: center; font-size: 10pt; padding: 2px;">-</td>
                     <td style="text-align: center; font-size: 10pt; padding: 2px;">-</td>
-                    <td style="text-align: center; font-size: 10pt; padding: 2px;">-</td>
-                    <td style="text-align: center; font-size: 10pt; padding: 2px;">-</td>
+                    <td style="text-align: center; font-size: 10pt; padding: 2px;">
+                        <?= $cuti['status'] === 'Ditolak' ? 'v' : '-'; ?>
+                    </td>
                 </tr>
 
                 <!-- Area tanda tangan -->
@@ -448,10 +548,14 @@ class CutiController
 
                 <!-- Tanda centang -->
                 <tr>
+                    <td style="text-align: center; font-size: 10pt; padding: 2px;">
+                        <?= $cuti['status'] === 'Disetujui' ? 'v' : '-'; ?>
+                    </td>
                     <td style="text-align: center; font-size: 10pt; padding: 2px;">-</td>
                     <td style="text-align: center; font-size: 10pt; padding: 2px;">-</td>
-                    <td style="text-align: center; font-size: 10pt; padding: 2px;">-</td>
-                    <td style="text-align: center; font-size: 10pt; padding: 2px;">-</td>
+                    <td style="text-align: center; font-size: 10pt; padding: 2px;">
+                        <?= $cuti['status'] === 'Ditolak' ? 'v' : '-'; ?>
+                    </td>
                 </tr>
 
                 <!-- Area tanda tangan -->
@@ -473,14 +577,14 @@ class CutiController
             
             <div style="font-size: 10pt; padding-left: 2px;">
                 Catatan :
-                <table style="border-collapse: collapse; font-size: 8pt; margin-top: 2px; border: none;">
+                <table style="border-collapse: collapse; font-size: 7pt; margin-top: 2px; border: none;">
                     <tr>
                         <td style="width: 60px; vertical-align: top; border: none; padding: 0px; padding-left: 2px;">*</td>
                         <td style="border: none; padding: 0px; padding-left: 2px;">Coret yang tidak perlu</td>
                     </tr>
                     <tr>
                         <td style="vertical-align: top; border: none; padding: 0px; padding-left: 2px;">**</td>
-                        <td style="border: none; padding: 0px; padding-left: 2px;">Pilih salah satu dengan memberi tanda centang (✔)</td>
+                        <td style="border: none; padding: 0px; padding-left: 2px;">Pilih salah satu dengan memberi tanda centang (V)</td>
                     </tr>
                     <tr>
                         <td style="vertical-align: top; border: none; padding: 0px; padding-left: 2px;">***</td>
@@ -505,7 +609,7 @@ class CutiController
                 </table>
             </div>
                 
-            <div style="border-bottom: 1px solid black; margin-top: 3px; margin-bottom: 2px;"></div>
+            <div style="border-bottom: 1px solid black; margin-top: 2px; margin-bottom: 2px;"></div>
             <div style="border-bottom: 2px solid black;"></div>
             </div>
             
@@ -538,6 +642,39 @@ class CutiController
         // Render dan keluarkan PDF
         $dompdf->render();
         $dompdf->stream('Formulir-Cuti.pdf', ['Attachment' => false]); // tampil di browser
+    }
+
+    public function hapusCuti()
+    {
+        if (!isset($_GET['id'])) {
+            $_SESSION['error'] = "ID tidak valid.";
+            header("Location: leave_history");
+            exit;
+        }
+
+        $id = $_GET['id'];
+        $status = $this->cutiModel->getStatusCuti($id);
+
+        if (!$status) {
+            $_SESSION['error'] = "Data tidak ditemukan!";
+            header("Location: leave_history");
+            exit;
+        }
+
+        if ($status['status'] === 'Disetujui' || $status['status'] === 'Ditolak') {
+            $_SESSION['error'] = "Data tidak bisa dihapus karena status sudah " . $status['status'];
+            header("Location: leave_history");
+            exit;
+        }
+
+        if ($this->cutiModel->delete($id)) {
+            $_SESSION['success'] = "Data berhasil dihapus!";
+        } else {
+            $_SESSION['error'] = "Gagal menghapus data.";
+        }
+        
+        header("Location: leave_history");
+        exit;
     }
 }
 ?>

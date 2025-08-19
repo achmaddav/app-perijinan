@@ -36,7 +36,7 @@ include __DIR__ . '/../layouts/header.php';
                                 <thead class="table-primary">
                                     <tr>
                                         <th>No</th>
-                                        <th>Nama Pengaju</th>
+                                        <th>Nama Pemohon</th>
                                         <th>Rencana Tanggal Keluar</th>
                                         <th>Alasan</th>
                                         <th>Status</th>
@@ -65,20 +65,65 @@ include __DIR__ . '/../layouts/header.php';
                                                 </td>
                                                 <td class="text-center">
                                                     <?php if (empty($izin['tanggal_keluar'])): ?>
-                                                        <form action="/app-perijinan/verify_keluar" method="POST">
-                                                            <input type="hidden" name="perizinan_id" value="<?= $izin['id']; ?>">
-                                                            <button type="submit" class="btn btn-warning btn-sm rounded-pill shadow-sm">Verifikasi Keluar</button>
-                                                        </form>
+                                                        <!-- Tombol untuk membuka modal -->
+                                                        <button type="button" class="btn btn-warning btn-sm rounded-pill shadow-sm" data-bs-toggle="modal" data-bs-target="#verifikasiKeluarModal<?= $izin['id'] ?>">
+                                                            Verifikasi Keluar
+                                                        </button>
+
+                                                        <!-- Modal -->
+                                                        <div class="modal fade" id="verifikasiKeluarModal<?= $izin['id'] ?>" tabindex="-1" aria-labelledby="verifikasiLabel<?= $izin['id'] ?>" aria-hidden="true">
+                                                        <div class="modal-dialog modal-dialog-centered">
+                                                            <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="verifikasiLabel<?= $izin['id'] ?>">Konfirmasi Verifikasi</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                Apakah Anda yakin ingin memverifikasi keluar untuk <strong><?= htmlspecialchars($izin['nama_pengaju']) ?></strong>?
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <form action="/app-perijinan/verify_keluar" method="POST">
+                                                                    <input type="hidden" name="perizinan_id" value="<?= $izin['id']; ?>">
+                                                                    <button type="submit" class="btn btn-warning">Ya, Verifikasi</button>
+                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                                                </form>
+                                                            </div>
+                                                            </div>
+                                                        </div>
+                                                        </div>
                                                     <?php else: ?>
                                                         <span class="badge bg-success">Done</span>
                                                     <?php endif; ?>
                                                 </td>
+
                                                 <td class="text-center">
                                                     <?php if (!empty($izin['tanggal_keluar']) && empty($izin['tanggal_masuk'])): ?>
-                                                        <form action="/app-perijinan/verify_masuk" method="POST">
-                                                            <input type="hidden" name="perizinan_id" value="<?= $izin['id']; ?>">
-                                                            <button type="submit" class="btn btn-secondary btn-sm rounded-pill shadow-sm">Verifikasi Masuk</button>
-                                                        </form>
+                                                        <!-- Tombol untuk membuka modal -->
+                                                        <button type="button" class="btn btn-warning btn-sm rounded-pill shadow-sm" data-bs-toggle="modal" data-bs-target="#verifikasiMasukModal<?= $izin['id'] ?>">
+                                                            Verifikasi Masuk
+                                                        </button>
+
+                                                        <!-- Modal -->
+                                                        <div class="modal fade" id="verifikasiMasukModal<?= $izin['id'] ?>" tabindex="-1" aria-labelledby="verifikasiLabel<?= $izin['id'] ?>" aria-hidden="true">
+                                                        <div class="modal-dialog modal-dialog-centered">
+                                                            <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="verifikasiLabel<?= $izin['id'] ?>">Konfirmasi Verifikasi</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                Apakah Anda yakin ingin memverifikasi masuk untuk <strong><?= htmlspecialchars($izin['nama_pengaju']) ?></strong>?
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <form action="/app-perijinan/verify_masuk" method="POST">
+                                                                    <input type="hidden" name="perizinan_id" value="<?= $izin['id']; ?>">
+                                                                    <button type="submit" class="btn btn-warning">Ya, Verifikasi</button>
+                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                                                </form>
+                                                            </div>
+                                                            </div>
+                                                        </div>
+                                                        </div>
                                                     <?php elseif (!empty($izin['tanggal_keluar']) && !empty($izin['tanggal_masuk'])): ?>
                                                         <span class="badge bg-success">Done</span>
                                                     <?php endif; ?>

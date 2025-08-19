@@ -15,17 +15,20 @@
       color: #333;
       min-height: 100vh;
       display: flex;
+      padding: 30px 20px;
       align-items: center;
       justify-content: center;
     }
+    
     .login-container {
       max-width: 400px;
       width: 100%;
-      padding: 30px;
+      padding: 30px 30px;
       background: #fff;
       border-radius: 10px;
       box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
     }
+
     .login-container h3 {
       margin-bottom: 20px;
       font-weight: bold;
@@ -34,6 +37,8 @@
     .input-group-text {
       background: transparent;
       border: none;
+      margin-left: auto;
+      margin-right: auto;
     }
     .form-control:focus {
       box-shadow: none;
@@ -50,26 +55,25 @@
 </head>
 <body>
   <div class="login-container">
-    <h3 class="text-center">Login</h3>
-    <form action="/app-perijinan/authenticate" method="post">
-      <div class="mb-3">
-        <label for="email" class="form-label">Email</label>
-        <input type="email" name="email" class="form-control" placeholder="Masukkan email" required>
-      </div>
-      <div class="mb-3">
-        <label for="password" class="form-label">Password</label>
-        <!-- Menggunakan input group untuk tombol show/hide password -->
-        <div class="input-group">
-          <input type="password" name="password" id="password" class="form-control" placeholder="Masukkan password" required>
-          <span class="input-group-text">
-            <i class="fas fa-eye" id="togglePassword" style="cursor: pointer;"></i>
-          </span>
+      <h3 class="text-center">Login</h3>
+      <form action="/app-perijinan/authenticate" method="post">
+        <div class="mb-3">
+          <label for="nip" class="form-label">NIP</label>
+          <input type="nip" name="nip" class="form-control" placeholder="Masukkan nip" required>
         </div>
-      </div>
-      <button type="submit" class="btn btn-primary w-100 mt-3">Login</button>
-    </form>
-  </div>
-
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <!-- Menggunakan input group untuk tombol show/hide password -->
+          <div class="input-group">
+            <input type="password" name="password" id="password" class="form-control" placeholder="Masukkan password" required>
+            <span class="input-group-text">
+              <i class="fas fa-eye" id="togglePassword" style="cursor: pointer;"></i>
+            </span>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary w-100 mt-3">Login</button>
+      </form>
+    </div>
   <!-- JavaScript Bootstrap & Show Password -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>

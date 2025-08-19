@@ -16,7 +16,7 @@
                 </li>
 
                 <!-- Menu untuk User dan Atasan (Ajukan & Riwayat Perizinan) -->
-                <?php if ($jabatan === 'User' || $jabatan === 'Atasan') { ?>
+                <?php if ($jabatan === 'STF' || $jabatan === 'KTA') { ?>
                     <li class="nav-item">
                         <a href="/app-perijinan/ajukan_perizinan" class="nav-link text-dark rounded-3">
                             <i class="nav-icon fas fa-edit text-success"></i>
@@ -32,7 +32,7 @@
                 <?php } ?>
 
                 <!-- Menu untuk SuperUser (Daftar Pegawai) -->
-                <?php if ($jabatan === 'SuperUser') { ?>
+                <?php if ($jabatan === 'KEP') { ?>
                     <li class="nav-item">
                         <a href="/app-perijinan/daftar_pegawai" class="nav-link text-dark rounded-3">
                             <i class="nav-icon fas fa-user text-warning"></i>
@@ -42,7 +42,7 @@
                 <?php } ?>
 
                 <!-- Menu untuk Atasan dan SuperUser (Daftar & Laporan Perizinan) -->
-                <?php if ($jabatan === 'Atasan' || $jabatan === 'SuperUser') { ?>
+                <?php if ($jabatan === 'KTA' || $jabatan === 'KEP') { ?>
                     <li class="nav-item">
                         <a href="/app-perijinan/daftar_perizinan" class="nav-link text-dark rounded-3">
                             <i class="nav-icon fas fa-list text-secondary"></i>
@@ -58,7 +58,7 @@
                 <?php } ?>
 
                 <!-- Menu untuk Satpam -->
-                <?php if ($jabatan === 'Satpam') { ?>
+                <?php if ($jabatan === 'SCT') { ?>
                     <li class="nav-item">
                         <a href="/app-perijinan/verifikasi" class="nav-link text-dark rounded-3">
                             <i class="nav-icon fas fa-id-card text-warning"></i>
@@ -86,7 +86,7 @@
                 <?php } ?>
 
                 <!-- Menu cuti -->
-                <?php if ($jabatan !== 'Satpam') { ?>
+                <?php if ($jabatan !== 'SCT') { ?>
                     <li class="nav-item">
                         <a href="/app-perijinan/dashboard_cuti" class="nav-link text-dark rounded-3">
                             <i class="nav-icon fas fa-clock text-warning"></i>

@@ -26,18 +26,19 @@ class LaporanController {
         $status_filter = filter_input(INPUT_GET, 'status', FILTER_SANITIZE_STRING) ?: '';
         $pemohon_filter = filter_input(INPUT_GET, 'pemohon', FILTER_SANITIZE_STRING) ?: '';
         
+        $user_id = $_SESSION['user_id'];
         $jabatan = $_SESSION['jabatan'] ?? '';
 
         // Ambil data laporan perizinan berdasarkan filter dan pagination
-        $data = $this->model->getLaporanPerizinan($jabatan, $month_filter, $status_filter, $pemohon_filter, $limit, $offset);
-        $totalData = $this->model->countTotalLaporan($jabatan, $month_filter, $status_filter, $pemohon_filter);
+        $data = $this->model->getLaporanPerizinan($user_id, $jabatan, $month_filter, $status_filter, $pemohon_filter, $limit, $offset);
+        $totalData = $this->model->countTotalLaporan($user_id, $jabatan, $month_filter, $status_filter, $pemohon_filter);
         $totalPages = ceil($totalData / $limit);
         
         // Pastikan halaman tidak melebihi batas total halaman
         if ($page > $totalPages && $totalPages > 0) {
             $page = $totalPages;
             $offset = ($page - 1) * $limit;
-            $data = $this->model->getLaporanPerizinan($jabatan, $month_filter, $status_filter, $pemohon_filter, $limit, $offset);
+            $data = $this->model->getLaporanPerizinan($user_id, $jabatan, $month_filter, $status_filter, $pemohon_filter, $limit, $offset);
         }
         
         // Sertakan view dan kirim variabel yang diperlukan
@@ -58,18 +59,19 @@ class LaporanController {
         $status_filter = filter_input(INPUT_GET, 'status', FILTER_SANITIZE_STRING) ?: '';
         $pemohon_filter = filter_input(INPUT_GET, 'pemohon', FILTER_SANITIZE_STRING) ?: '';
         
+        $user_id = $_SESSION['user_id'];
         $jabatan = $_SESSION['jabatan'] ?? '';
 
         // Ambil data laporan perizinan berdasarkan filter dan pagination
-        $data = $this->cutiModel->getLaporanCuti($jabatan, $month_filter, $status_filter, $pemohon_filter, $limit, $offset);
-        $totalData = $this->cutiModel->countTotalLaporan($jabatan, $month_filter, $status_filter, $pemohon_filter);
+        $data = $this->cutiModel->getLaporanCuti($user_id, $jabatan, $month_filter, $status_filter, $pemohon_filter, $limit, $offset);
+        $totalData = $this->cutiModel->countTotalLaporan($user_id, $jabatan, $month_filter, $status_filter, $pemohon_filter);
         $totalPages = ceil($totalData / $limit);
         
         // Pastikan halaman tidak melebihi batas total halaman
         if ($page > $totalPages && $totalPages > 0) {
             $page = $totalPages;
             $offset = ($page - 1) * $limit;
-            $data = $this->cutiModel->getLaporanCuti($jabatan, $month_filter, $status_filter, $pemohon_filter, $limit, $offset);
+            $data = $this->cutiModel->getLaporanCuti($user_id, $jabatan, $month_filter, $status_filter, $pemohon_filter, $limit, $offset);
         }
         
         // Sertakan view dan kirim variabel yang diperlukan

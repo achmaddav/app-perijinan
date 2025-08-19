@@ -1,11 +1,17 @@
 <?php
+require_once __DIR__ . '/../models/User.php';
+require_once __DIR__ . '/../models/JabatanModel.php';
 require_once __DIR__ . '/../models/PerizinanModel.php';
 
 class PerizinanController {
+    private $modelUser;
     private $model;
+    private $modelJabatan;
 
     public function __construct($db) {
+        $this->modelUser = new User($db);
         $this->model = new PerizinanModel($db);
+        $this->modelJabatan = new JabatanModel($db);
     }
 
     // Menampilkan halaman form pengajuan perizinan
@@ -15,14 +21,11 @@ class PerizinanController {
             exit();
         }
 
-        $jabatan = $_SESSION['jabatan'] ?? '';
-        $atasanList = [];
+        $kodeJabatan = $_SESSION['jabatan'];
+        $atasan_id = $_SESSION['atasan'];
 
-        if ($jabatan === 'User') {
-            $atasanList = $this->model->getAtasanList('Atasan');
-        } else if ($jabatan === 'Atasan') {
-            $atasanList = $this->model->getAtasanList('SuperUser');
-        }
+        $jabatan_user = $this->modelJabatan->getNamaJabatanByKode($kodeJabatan);
+        $atasan = $this->modelUser->getAtasanById($atasan_id);
 
         require_once __DIR__ . '/../views/pengaju/ajukan_perizinan.php';
     }
