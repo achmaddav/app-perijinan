@@ -17,7 +17,7 @@
                             <div class="card-body">
                                 <!-- Notifikasi -->
                                 <?php if (isset($_SESSION['success'])): ?>
-                                    <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+                                    <div class="alert alert-success alert-dismissible fade show shadow-sm auto-dismiss" role="alert">
                                         <i class="fas fa-check-circle me-2"></i> <?= $_SESSION['success']; ?>
                                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                     </div>
@@ -25,7 +25,7 @@
                                 <?php endif; ?>
 
                                 <?php if (isset($_SESSION['error'])): ?>
-                                    <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+                                    <div class="alert alert-danger alert-dismissible fade show shadow-sm auto-dismiss" role="alert">
                                         <i class="fas fa-exclamation-circle me-2"></i> <?= $_SESSION['error']; ?>
                                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                     </div>

@@ -13,16 +13,18 @@ class User {
                 p.*, 
                 j.kode AS kode_jabatan,
                 d.nama AS divisi
-            FROM " . $this->table_name . " p
+            FROM {$this->table_name} p
             LEFT JOIN jabatan j ON p.jabatan_id = j.id
             LEFT JOIN divisitim d ON p.divisi_id = d.id
-            WHERE p.nip = ?
+            WHERE p.nip = :nip
+            AND p.IsActive = 1
             LIMIT 1
         ";
 
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(1, $nip);
+        $stmt->bindParam(':nip', $nip, PDO::PARAM_STR);
         $stmt->execute();
+
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
@@ -153,15 +155,33 @@ class User {
     } 
     
     public function getUserById($id) {
-        $query = "SELECT 
+        $query = "SELECT
+                    u.id, 
                     u.nama AS user_nama,
                     u.nip,
                     u.email,
+                    u.birth_of_date,
+                    u.place_of_birth,
+                    u.phone_number,
+                    u.address,
+                    u.tanggal_mulai_kerja,
                     CONCAT(COALESCE(j.nama, ''), ' ', COALESCE(d.nama, '')) AS jabatan
                   FROM users u
                   INNER JOIN jabatan j ON u.jabatan_id = j.id
                   LEFT JOIN divisitim d ON u.divisi_id = d.id  
                   WHERE u.id = :id
+                  LIMIT 1";
+                  
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function getUpdateUserById($id) {
+        $query = "SELECT *
+                  FROM users 
+                  WHERE id = :id
                   LIMIT 1";
                   
         $stmt = $this->conn->prepare($query);
@@ -203,5 +223,183 @@ class User {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public function getAllLeader() {
+        $query = "SELECT u.id, u.nama 
+                FROM users u
+                INNER JOIN jabatan j ON u.jabatan_id = j.id
+                WHERE j.Kode = :code";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute([':code' => 'KTA']);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getAllHead() {
+        $query = "SELECT u.id, u.nama 
+                FROM users u
+                INNER JOIN jabatan j ON u.jabatan_id = j.id
+                WHERE j.Kode = :code";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute([':code' => 'KEP']);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function insertUser($nama, $tanggal_lahir, $tempat_lahir, 
+        $email, $phone_number, $alamat, $nip, $jenisJabatan, $timKerja,
+        $ketua_timker, $kepala_balai, $tanggal_kerja) {
+        try {
+            // Hash password default di PHP, bukan di SQL
+            $hashedPassword = password_hash("123456", PASSWORD_BCRYPT);
+
+            $query = "INSERT INTO users (
+                        nama, 
+                        birth_of_date, 
+                        place_of_birth, 
+                        nip, 
+                        email, 
+                        phone_number, 
+                        address, 
+                        password, 
+                        jabatan_id,
+                        kepala_id,
+                        atasan_id,
+                        divisi_id,
+                        tanggal_mulai_kerja,
+                        IsActive,
+                        created_at
+                    ) VALUES (
+                        :nama, 
+                        :tanggal_lahir, 
+                        :tempat_lahir, 
+                        :nip,
+                        :email, 
+                        :phone_number, 
+                        :alamat, 
+                        :password, 
+                        :jabatan_id,
+                        :kepala_id,
+                        :atasan_id,
+                        :divisi_id,
+                        :tanggal_mulai_kerja,
+                        1,
+                        NOW()
+                    )";
+
+            $stmt = $this->conn->prepare($query);
+
+            $stmt->execute([
+                ':nama' => $nama,
+                ':tanggal_lahir' => $tanggal_lahir,
+                ':tempat_lahir' => $tempat_lahir,
+                ':nip' => $nip,
+                ':email' => $email,
+                ':phone_number' => $phone_number,
+                ':alamat' => $alamat,
+                ':password' => $hashedPassword, // password sudah di-hash
+                ':jabatan_id' => $jenisJabatan,
+                ':kepala_id' => !empty($kepala_balai) ? $kepala_balai : null,
+                ':atasan_id' => !empty($ketua_timker) ? $ketua_timker : null,
+                ':divisi_id' => $timKerja,
+                ':tanggal_mulai_kerja' => $tanggal_kerja
+            ]);
+
+            return true;
+        } catch (PDOException $e) {
+            error_log("Insert User Error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function updatePassword($id, $newHash)
+    {
+        $query = "
+            UPDATE " . $this->table_name . "
+            SET password = :password,
+                updated_at = NOW()
+            WHERE id = :id
+        ";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':password', $newHash);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+
+        return $stmt->execute();
+    }
+
+    public function updateUser($id, $nama, $tanggal_lahir, $tempat_lahir,
+        $email, $phone_number, $alamat, $nip, $jenisJabatan,
+        $timKerja, $ketua_timker, $kepala_balai, $tanggal_kerja)
+    {
+        try {
+            $sql = "UPDATE users SET 
+                        nama = :nama,
+                        birth_of_date = :tanggal_lahir,
+                        place_of_birth = :tempat_lahir,
+                        email = :email,
+                        phone_number = :phone_number,
+                        address = :alamat,
+                        nip = :nip,
+                        jabatan_id = :jabatan_id,
+                        divisi_id = :divisi_id,
+                        atasan_id = :atasan_id,
+                        kepala_id = :kepala_id,
+                        tanggal_mulai_kerja = :tanggal_kerja,
+                        updated_at = NOW()
+                    WHERE id = :id";
+
+            $stmt = $this->conn->prepare($sql);
+            return $stmt->execute([
+                ':id' => $id,
+                ':nama' => $nama,
+                ':tanggal_lahir' => $tanggal_lahir,
+                ':tempat_lahir' => $tempat_lahir,
+                ':email' => $email,
+                ':phone_number' => $phone_number,
+                ':alamat' => $alamat,
+                ':nip' => $nip,
+                ':jabatan_id' => $jenisJabatan,
+                ':divisi_id' => $timKerja,
+                ':atasan_id' => !empty($ketua_timker) ? $ketua_timker : null,
+                ':kepala_id' => !empty($kepala_balai) ? $kepala_balai : null,
+                ':tanggal_kerja' => $tanggal_kerja
+            ]);
+        } catch (PDOException $e) {
+            error_log("Update User Error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function updateProfil($id, $nama, $tanggal_lahir, $tempat_lahir,
+        $email, $phone_number, $alamat)
+    {
+        try {
+            $sql = "UPDATE users SET 
+                        nama = :nama,
+                        birth_of_date = :tanggal_lahir,
+                        place_of_birth = :tempat_lahir,
+                        email = :email,
+                        phone_number = :phone_number,
+                        address = :alamat,
+                        updated_at = NOW()
+                    WHERE id = :id";
+
+            $stmt = $this->conn->prepare($sql);
+            return $stmt->execute([
+                ':id' => $id,
+                ':nama' => $nama,
+                ':tanggal_lahir' => $tanggal_lahir,
+                ':tempat_lahir' => $tempat_lahir,
+                ':email' => $email,
+                ':phone_number' => $phone_number,
+                ':alamat' => $alamat
+            ]);
+        } catch (PDOException $e) {
+            error_log("Update User Error: " . $e->getMessage());
+            return false;
+        }
+    }
 }
 ?>

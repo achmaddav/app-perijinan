@@ -278,6 +278,7 @@ class CutiModel {
                 tc.nama AS jenis_cuti, 
                 u.nama AS nama_pemohon, 
                 u.nip, 
+                u.phone_number,
                 CONCAT(j.nama, ' ', dt.nama) AS jabatan,
                 u.tanggal_mulai_kerja,
                 TIMESTAMPDIFF(YEAR, u.tanggal_mulai_kerja, CURDATE()) AS tahun_masa_kerja,

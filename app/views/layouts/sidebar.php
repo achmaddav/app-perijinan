@@ -32,7 +32,7 @@
                 <?php } ?>
 
                 <!-- Menu untuk SuperUser (Daftar Pegawai) -->
-                <?php if ($jabatan === 'KEP') { ?>
+                <?php if ($jabatan === 'KEP' || $jabatan === 'ADM') { ?>
                     <li class="nav-item">
                         <a href="/app-perijinan/daftar_pegawai" class="nav-link text-dark rounded-3">
                             <i class="nav-icon fas fa-user text-warning"></i>
@@ -86,7 +86,7 @@
                 <?php } ?>
 
                 <!-- Menu cuti -->
-                <?php if ($jabatan !== 'SCT') { ?>
+                <?php if ($jabatan !== 'SCT' && $jabatan !== 'ADM') { ?>
                     <li class="nav-item">
                         <a href="/app-perijinan/dashboard_cuti" class="nav-link text-dark rounded-3">
                             <i class="nav-icon fas fa-clock text-warning"></i>

@@ -12,7 +12,7 @@
 
                 <!-- Notifikasi -->
                 <?php if (isset($_SESSION['success'])): ?>
-                    <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+                    <div class="alert alert-success alert-dismissible fade show shadow-sm auto-dismiss" role="alert">
                         <i class="fas fa-check-circle me-2"></i> <?= $_SESSION['success']; ?>
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
@@ -20,7 +20,7 @@
                 <?php endif; ?>
 
                 <?php if (isset($_SESSION['error'])): ?>
-                    <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+                    <div class="alert alert-danger alert-dismissible fade show shadow-sm auto-dismiss" role="alert">
                         <i class="fas fa-exclamation-circle me-2"></i> <?= $_SESSION['error']; ?>
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
@@ -68,7 +68,7 @@
                                                     <?php if ($leave['status'] === 'Disetujui' || $leave['status'] === 'Ditolak'): ?>
                                                         <button class="btn btn-sm btn-secondary shadow-sm rounded-3"
                                                                 onclick="showCannotDeleteAlert('<?= $leave['status']; ?>')">
-                                                            <i class="fas fa-trash"></i> Hapus
+                                                            Hapus
                                                         </button>
                                                     <?php else: ?>
                                                         <button class="btn btn-sm btn-danger shadow-sm rounded-3"
@@ -77,7 +77,7 @@
                                                                 data-id="<?= $leave['id']; ?>"
                                                                 data-fromDate="<?= htmlspecialchars($leave['tanggal_mulai']); ?>"
                                                                 data-tillDate="<?= htmlspecialchars($leave['tanggal_selesai']); ?>">
-                                                            <i class="fas fa-trash"></i> Hapus
+                                                            Hapus
                                                         </button>
                                                     <?php endif; ?>
                                                 </td>
@@ -86,8 +86,8 @@
                                                         <input type="hidden" name="id" value="<?= $leave['id']; ?>">
                                                         
                                                         <?php if ($leave['status'] === 'Disetujui'): ?>
-                                                            <button type="button" onclick="submitFormPDF()" class="btn btn-primary btn-sm rounded-pill shadow-sm">
-                                                                <i class="fas fa-file-pdf me-1"></i> Cetak
+                                                            <button type="button" onclick="submitFormPDF()" class="btn btn-primary btn-sm shadow-sm rounded-3">
+                                                                Cetak
                                                             </button>
                                                         <?php endif; ?>
                                                     </form>

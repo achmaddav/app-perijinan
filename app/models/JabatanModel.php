@@ -19,5 +19,13 @@ class JabatanModel {
 
         return $stmt->fetch(PDO::FETCH_ASSOC); // karena satu data
     }
-  
+    
+    public function getAllPosition() {
+        $query = "SELECT * FROM jabatan d";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC); 
+    }
 }

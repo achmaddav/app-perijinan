@@ -22,7 +22,15 @@ function route($conn) {
         'profil',
         'leave_history',
         'proses_approval_cuti',
-        'laporan_cuti'
+        'laporan_cuti',
+        'user_add',
+        'insert_user',
+        'user_edit',
+        'process_user_update',
+        'edit_profil',
+        'process_update_profil',
+        'edit_password',
+        'process_update_password'
     ];
 
     // Redirect ke halaman login jika halaman yang diakses butuh autentikasi
@@ -34,9 +42,9 @@ function route($conn) {
 
     // Daftar role yang diperbolehkan untuk masing-masing halaman
     $role_permissions = [
-        'dashboard'                 => ['STF', 'KTA', 'KEP', 'SCT'],
-        'daftar_pegawai'            => ['KEP'],
-        'user_detail'               => ['KEP'],
+        'dashboard'                 => ['STF', 'KTA', 'KEP', 'SCT', 'ADM'],
+        'daftar_pegawai'            => ['ADM', 'KEP'],
+        'user_detail'               => ['ADM', 'KEP'],
         'ajukan_perizinan'          => ['STF', 'KTA'],
         'status_perizinan'          => ['STF', 'KTA'],
         'hapus_perizinan'           => ['STF', 'KTA'],
@@ -48,10 +56,18 @@ function route($conn) {
         'verify_masuk'              => ['SCT'],
         'verifikasi_non_perizinan'  => ['SCT'],
         'history_verify'            => ['SCT'],
-        'profil'                    => ['STF', 'KTA', 'KEP', 'SCT'],
+        'profil'                    => ['STF', 'KTA', 'KEP', 'SCT', 'ADM'],
         'leave_history'             => ['STF', 'KTA'],
         'proses_approval_cuti'      => ['KEP', 'KTA'],
-        'laporan_cuti'              => ['KEP', 'KTA']
+        'laporan_cuti'              => ['KEP', 'KTA'],
+        'user_add'                  => ['ADM'],
+        'insert_user'               => ['ADM'],
+        'user_edit'                 => ['ADM'],
+        'process_user_update'       => ['ADM', 'KEP'],
+        'edit_profil'               => ['STF', 'KTA', 'KEP'],
+        'process_update_profil'     => ['STF', 'KTA', 'KEP'],
+        'edit_password'             => ['STF', 'KTA', 'KEP', 'ADM'],
+        'process_update_password'   => ['STF', 'KTA', 'KEP', 'ADM']
     ];
 
     // Jika halaman memiliki batasan role, periksa apakah pengguna memiliki izin
@@ -260,6 +276,70 @@ function route($conn) {
             require_once __DIR__ . '/app/controllers/CutiController.php';
             $controller = new CutiController($conn);
             $controller->hapusCuti();
+            break;
+
+        case 'user_add':
+            require_once __DIR__ . '/app/controllers/AdminController.php';
+            $controller = new AdminController($conn);
+            $controller->user_add();
+            break;
+
+        case 'insert_user':
+            require_once __DIR__ . '/app/controllers/AdminController.php';
+            $controller = new AdminController($conn);
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $controller->insert_user();
+            } else {
+                $controller->user_add();
+            }
+            break;
+
+        case 'user_edit':
+            require_once __DIR__ . '/app/controllers/AdminController.php';
+            $controller = new AdminController($conn);
+            $controller->editUser();
+            break;
+
+        case 'process_user_update':
+            require_once __DIR__ . '/app/controllers/AdminController.php';
+            $controller = new AdminController($conn);
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $controller->processUserUpdate();
+            } else {
+                $controller->editUser();
+            }
+            break;
+
+        case 'edit_profil':
+            require_once __DIR__ . '/app/controllers/UserController.php';
+            $controller = new UserController($conn);
+            $controller->editProfil();
+            break;
+
+        case 'process_update_profil':
+            require_once __DIR__ . '/app/controllers/UserController.php';
+            $controller = new UserController($conn);
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $controller->processUpdateProfil(); 
+            } else {
+                $controller->editProfil();
+            }
+            break;
+
+        case 'edit_password':
+            require_once __DIR__ . '/app/controllers/UserController.php';
+            $controller = new UserController($conn);
+            $controller->editPassword(); 
+            break;
+
+        case 'process_update_password':
+            require_once __DIR__ . '/app/controllers/UserController.php';
+            $controller = new UserController($conn);
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $controller->processUpdatePassword(); 
+            } else {
+                $controller->editPassword();
+            }
             break;
 
         default:

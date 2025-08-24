@@ -479,7 +479,7 @@ class CutiController
 
                     <!-- TELP -->
                     <td style="width: 10%; vertical-align: top; font-size: 8pt; padding: 0px; padding-left: 2px;">TELP</td>
-                    <td style="width: 40%; vertical-align: top; font-size: 8pt; padding: 0px; padding-left: 2px;">&nbsp;</td>
+                    <td style="width: 40%; vertical-align: top; font-size: 8pt; padding: 0px; padding-left: 2px;"><?= htmlspecialchars($cuti['phone_number']); ?></td>
                 </tr>
                 <tr>
                     <td colspan="2" style="text-align: center; vertical-align: top; font-size: 8pt; padding: 0px; padding-left: 2px;">
