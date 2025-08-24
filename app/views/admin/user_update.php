@@ -100,6 +100,7 @@
                                                 <label class="col-md-4 col-form-label">Jabatan</label>
                                                 <div class="col-md-8">
                                                     <select name="jenisJabatan" class="form-select">
+                                                        <option value="">-- Tidak Ada --</option>
                                                         <?php foreach ($positions as $pos): ?>
                                                             <option value="<?= $pos['id']; ?>" <?= $user['jabatan_id']==$pos['id'] ? 'selected' : ''; ?>>
                                                                 <?= htmlspecialchars($pos['nama']); ?>
@@ -113,6 +114,7 @@
                                                 <label class="col-md-4 col-form-label">Tim Kerja</label>
                                                 <div class="col-md-8">
                                                     <select name="timKerja" class="form-select">
+                                                        <option value="">-- Tidak Ada --</option>
                                                         <?php foreach ($divisions as $div): ?>
                                                             <option value="<?= $div['id']; ?>" <?= $user['divisi_id']==$div['id'] ? 'selected' : ''; ?>>
                                                                 <?= htmlspecialchars($div['nama']); ?>

@@ -50,7 +50,8 @@ class AtasanController {
     }    
 
     public function getUsers() {
-        $users = $this->userModel->getAllUser();
+        $id = $_SESSION['user_id'];
+        $users = $this->userModel->getAllUser($id);
         require_once __DIR__ . '/../views/atasan/daftar_user.php';
     }
 

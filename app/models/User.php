@@ -35,17 +35,19 @@ class User {
         return $stmt->execute([$nama, $email, $hashed_password, $jabatan]);
     }
 
-    public function getAllUser() {
-        $query = "SELECT p.id, p.nama, p.nip, p.email, CONCAT(j.nama, ' ', d.nama) AS jabatan
+    public function getAllUser($id) {
+        $query = "SELECT p.id, p.nama, p.nip, p.email, 
+                        CONCAT_WS(' ', j.nama, d.nama) AS jabatan
                 FROM " . $this->table_name . " p
                 LEFT JOIN jabatan j ON p.jabatan_id = j.id
                 LEFT JOIN divisitim d ON p.divisi_id = d.id
-                WHERE j.kode NOT IN ('KEP', 'SCT') 
+                WHERE p.id != :id
                 ORDER BY p.nama ASC";
 
         $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC); 
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function findDetailUser($id) {
@@ -302,7 +304,7 @@ class User {
                 ':jabatan_id' => $jenisJabatan,
                 ':kepala_id' => !empty($kepala_balai) ? $kepala_balai : null,
                 ':atasan_id' => !empty($ketua_timker) ? $ketua_timker : null,
-                ':divisi_id' => $timKerja,
+                ':divisi_id' => !empty($timKerja) ? $timKerja : null,
                 ':tanggal_mulai_kerja' => $tanggal_kerja
             ]);
 
@@ -361,7 +363,7 @@ class User {
                 ':alamat' => $alamat,
                 ':nip' => $nip,
                 ':jabatan_id' => $jenisJabatan,
-                ':divisi_id' => $timKerja,
+                ':divisi_id' => !empty($timKerja) ? $timKerja : null,
                 ':atasan_id' => !empty($ketua_timker) ? $ketua_timker : null,
                 ':kepala_id' => !empty($kepala_balai) ? $kepala_balai : null,
                 ':tanggal_kerja' => $tanggal_kerja
