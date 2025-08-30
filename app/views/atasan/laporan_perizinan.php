@@ -48,6 +48,12 @@ include __DIR__ . '/../layouts/header.php';
                 <!-- Tabel Laporan Perizinan -->
                 <div class="card shadow-lg border-0">
                     <div class="card-body">
+                        <div class="d-flex justify-content-end mb-3">
+                            <a href="index.php?page=export_laporan_excel&month=<?= urlencode($month_filter) ?>&status=<?= urlencode($status_filter) ?>&pemohon=<?= urlencode($pemohon_filter) ?>" 
+                            class="btn btn-success btn-sm shadow-sm">
+                                <i class="fas fa-file-excel me-2"></i> Export Excel
+                            </a>
+                        </div>
                         <div class="table-responsive">
                             <table class="table table-hover align-middle">
                                 <thead class="table-primary">
@@ -57,10 +63,10 @@ include __DIR__ . '/../layouts/header.php';
                                         <th>Alasan</th>
                                         <th>Status</th>
                                         <th>Tanggal Keluar</th>
-                                        <th>Durasi</th>
+                                        <th>Durasi (Jam)</th>
                                         <th>Approver</th>
                                         <th>Waktu Pengajuan</th>
-                                        <th>Total Waktu Keluar</th>
+                                        <th>Aktual Waktu Keluar</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -78,7 +84,7 @@ include __DIR__ . '/../layouts/header.php';
                                                 </span>
                                             </td>
                                             <td><?= htmlspecialchars($row['tanggal_rencana_keluar']) ?></td>
-                                            <td><?= htmlspecialchars($row['durasi_keluar']) ?> menit</td>
+                                            <td><?= htmlspecialchars($row['durasi_keluar']) ?></td>
                                             <td><?= htmlspecialchars($row['nama_atasan'] ?? '-') ?></td>
                                             <td><?= htmlspecialchars($row['created_at']) ?></td>
                                             <td><?= htmlspecialchars($row['total_waktu_keluar']) ?></td>
@@ -136,6 +142,20 @@ include __DIR__ . '/../layouts/header.php';
         background-color: #e9ecef;
         transition: all 0.3s ease;
     }
+
+    @media print {
+    /* Hilangkan sidebar, navbar, tombol */
+    .navbar, .sidebar, .btn, .pagination {
+        display: none !important;
+    }
+
+    /* Biar tabel penuh kertas */
+    .content-wrapper {
+        margin: 0;
+        padding: 0;
+    }
+}
+
 </style>
 
 <?php include __DIR__ . '/../layouts/footer.php'; ?>

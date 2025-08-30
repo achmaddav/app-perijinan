@@ -170,57 +170,45 @@ class CutiModel {
     }
 
     public function getLaporanCuti($user_id, $jabatan, $month, $status, $pemohon, $limit, $offset) {        
-        if ($jabatan == "KTA") {
-            $query = "SELECT 
-                        c.id, 
-                        u.nama AS nama_pemohon, 
-                        c.alasan, 
-                        c.status, 
-                        c.tanggal_mulai,
-                        c.tanggal_selesai, 
-                        (
-                            SELECT COUNT(*)
-                            FROM calendar cal
-                            WHERE cal.tanggal BETWEEN c.tanggal_mulai AND c.tanggal_selesai
-                            AND cal.is_weekend = 0
-                            AND cal.is_dayoff = 0
-                        ) AS lama_cuti,
-                        a.nama AS approver, 
-                        DATE(c.created_at) AS tanggal_pengajuan
-                    FROM cuti c
-                    JOIN users u ON c.user_id = u.id
-                    JOIN users a ON c.approved_by = a.id
-                    WHERE DATE_FORMAT(c.created_at, '%Y-%m') = :month
-                        AND c.approved_by = :user_id";
-        } else {
-            $query = "SELECT 
-                        c.id, 
-                        u.nama AS nama_pemohon, 
-                        c.alasan, 
-                        c.status, 
-                        c.tanggal_mulai,
-                        c.tanggal_selesai, 
-                        (
-                            SELECT COUNT(*)
-                            FROM calendar cal
-                            WHERE cal.tanggal BETWEEN c.tanggal_mulai AND c.tanggal_selesai
-                            AND cal.is_weekend = 0
-                            AND cal.is_dayoff = 0
-                        ) AS lama_cuti,
-                        a.nama AS approver, 
-                        DATE(c.created_at) AS tanggal_pengajuan
-                    FROM cuti c
-                    JOIN users u ON c.user_id = u.id
-                    JOIN users a ON c.final_approved_by = a.id
-                    WHERE DATE_FORMAT(c.created_at, '%Y-%m') = :month
-                        AND c.final_approved_by = :user_id";
-        }
+        $query = "SELECT 
+                    c.id, 
+                    u.nama AS nama_pemohon, 
+                    c.alasan, 
+                    c.status, 
+                    c.tanggal_mulai,
+                    c.tanggal_selesai, 
+                    (
+                        SELECT COUNT(*)
+                        FROM calendar cal
+                        WHERE cal.tanggal BETWEEN c.tanggal_mulai AND c.tanggal_selesai
+                        AND cal.is_weekend = 0
+                        AND cal.is_dayoff = 0
+                    ) AS lama_cuti,
+                    a.nama AS approver, 
+                    DATE(c.created_at) AS tanggal_pengajuan
+                FROM cuti c
+                JOIN users u ON c.user_id = u.id
+                JOIN users a ON 
+                    CASE 
+                        WHEN :jabatan = 'KTA' THEN c.approved_by 
+                        ELSE c.final_approved_by 
+                    END = a.id
+                WHERE DATE_FORMAT(c.created_at, '%Y-%m') = :month";
 
         // Siapkan parameter dasar
         $params = [
             ':month' => $month,
-            ':user_id' => (int)$user_id
+            ':jabatan' => $jabatan
         ];
+
+        // Filter berdasarkan jabatan (kecuali ADM)
+        if ($jabatan == "KTA") {
+            $query .= " AND c.approved_by = :user_id";
+            $params[':user_id'] = (int)$user_id;
+        } elseif ($jabatan != "ADM") {
+            $query .= " AND c.final_approved_by = :user_id";
+            $params[':user_id'] = (int)$user_id;
+        }
 
         // Tambahkan filter status jika diberikan
         if (!empty($status)) {
@@ -234,7 +222,7 @@ class CutiModel {
             $params[':pemohon'] = "%" . $pemohon . "%";
         }
 
-        // Urutkan + limit
+        // Urutkan + limit offset
         $query .= " ORDER BY c.created_at DESC LIMIT :limit OFFSET :offset";
 
         $stmt = $this->conn->prepare($query);
@@ -253,7 +241,80 @@ class CutiModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-            
+    
+    public function getLaporanCutiAll($user_id, $jabatan, $month, $status, $pemohon) 
+    {
+        // Base query
+        $query = "SELECT 
+                    c.id, 
+                    u.nama AS nama_pemohon, 
+                    c.alasan, 
+                    c.status, 
+                    c.tanggal_mulai,
+                    c.tanggal_selesai, 
+                    (
+                        SELECT COUNT(*)
+                        FROM calendar cal
+                        WHERE cal.tanggal BETWEEN c.tanggal_mulai AND c.tanggal_selesai
+                        AND cal.is_weekend = 0
+                        AND cal.is_dayoff = 0
+                    ) AS lama_cuti,
+                    a.nama AS approver, 
+                    DATE(c.created_at) AS tanggal_pengajuan
+                FROM cuti c
+                JOIN users u ON c.user_id = u.id
+                JOIN users a ON (
+                    CASE 
+                        WHEN :jabatan = 'KTA' THEN c.approved_by
+                        ELSE c.final_approved_by
+                    END
+                ) = a.id
+                WHERE DATE_FORMAT(c.created_at, '%Y-%m') = :month";
+
+        // Parameter dasar
+        $params = [
+            ':month'   => $month,
+            ':jabatan' => $jabatan
+        ];
+
+        // Filter user_id hanya jika bukan ADM
+        if ($jabatan !== "ADM") {
+            if ($jabatan === "KTA") {
+                $query .= " AND c.approved_by = :user_id";
+            } else {
+                $query .= " AND c.final_approved_by = :user_id";
+            }
+            $params[':user_id'] = (int)$user_id;
+        }
+
+        // Filter status jika ada
+        if (!empty($status)) {
+            $query .= " AND c.status = :status";
+            $params[':status'] = $status;
+        }
+
+        // Filter pemohon jika ada
+        if (!empty($pemohon)) {
+            $query .= " AND u.nama LIKE :pemohon";
+            $params[':pemohon'] = "%" . $pemohon . "%";
+        }
+
+        // Urutkan terbaru
+        $query .= " ORDER BY c.created_at DESC";
+
+        $stmt = $this->conn->prepare($query);
+
+        // Binding parameter
+        foreach ($params as $key => $value) {
+            $paramType = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
+            $stmt->bindValue($key, $value, $paramType);
+        }
+
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
     // Metode untuk menghitung total data
     public function countTotalLaporan($user_id, $jabatan, $month, $status, $pemohon) {
         if ($jabatan == "KTA") {

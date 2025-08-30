@@ -75,6 +75,27 @@
                                                                     <i class="fas fa-edit me-1"></i> Edit
                                                                 </button>
                                                             </form>
+
+                                                            <!-- Tombol Reset Password (Trigger Modal) -->
+                                                            <button type="button" 
+                                                                    class="btn btn-danger btn-sm rounded shadow-sm btn-reset-password"
+                                                                    data-id="<?= htmlspecialchars($user['id']); ?>"
+                                                                    data-nama="<?= htmlspecialchars($user['nama']); ?>"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#modalResetPassword">
+                                                                <i class="fas fa-key me-1"></i> Reset Password
+                                                            </button>
+
+                                                            <!-- Tombol Nonaktifkan Pegawai (Trigger Modal) -->
+                                                            <button type="button" 
+                                                                    class="btn btn-secondary btn-sm rounded shadow-sm btn-nonaktifkan"
+                                                                    data-id="<?= htmlspecialchars($user['id']); ?>"
+                                                                    data-nama="<?= htmlspecialchars($user['nama']); ?>"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#modalNonaktifkan">
+                                                                <i class="fas fa-user-slash me-1"></i> Nonaktifkan
+                                                            </button>
+
                                                         <?php } ?>
                                                     </div>
                                                 </td>
@@ -96,6 +117,50 @@
         </section>
     </div>
 </div>
+<!-- Modal Konfirmasi Reset Password -->
+<div class="modal fade" id="modalResetPassword" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger" id="modalLabel"><i class="fas fa-exclamation-triangle"></i> Konfirmasi Reset Password</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Apakah Anda yakin ingin mereset password untuk pegawai berikut?</p>
+                <p class="fw-bold" id="resetUserName"></p>
+                <p class="text-muted">Password akan direset ke default <b>(123456)</b>.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <a href="#" id="btnReset" class="btn btn-danger">Ya, Reset</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal Konfirmasi Nonaktifkan Pegawai -->
+<div class="modal fade" id="modalNonaktifkan" tabindex="-1" aria-labelledby="modalNonaktifkanLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-secondary text-white">
+                <h5 class="modal-title" id="modalNonaktifkanLabel">
+                    <i class="fas fa-user-slash"></i> Konfirmasi Nonaktifkan Pegawai
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Apakah Anda yakin ingin menonaktifkan pegawai berikut?</p>
+                <p class="fw-bold" id="nonaktifUserName"></p>
+                <p class="text-muted">Pegawai ini tidak akan bisa login setelah dinonaktifkan.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                <a href="#" id="btnNonaktifkan" class="btn btn-secondary">Ya, Nonaktifkan</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 <style>
     .card-header {

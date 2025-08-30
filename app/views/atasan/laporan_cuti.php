@@ -49,6 +49,13 @@ include __DIR__ . '/../layouts/header.php';
                 <!-- Tabel Laporan Cuti -->
                 <div class="card shadow-lg border-0">
                     <div class="card-body">
+                        <div class="d-flex justify-content-end mb-3">
+                            <a href="index.php?page=export_laporan_cuti_excel&month=<?= urlencode($month_filter) ?>&status=<?= urlencode($status_filter) ?>&pemohon=<?= urlencode($pemohon_filter) ?>" 
+                            class="btn btn-success btn-sm shadow-sm">
+                                <i class="fas fa-file-excel me-2"></i> Export Excel
+                            </a>
+                        </div>
+
                         <div class="table-responsive">
                             <table class="table table-hover align-middle">
                                 <thead class="table-primary">

@@ -105,13 +105,62 @@ document.addEventListener("DOMContentLoaded", function () {
       if (leaveDateElem)
         leaveDateElem.textContent = fromDate + " sampai tanggal " + tillDate;
 
-      // Set link hapus dengan ID yang dipilih
       let btnHapus = document.getElementById("btnHapus");
       if (btnHapus)
         btnHapus.href =
           "/app-perijinan/hapus_cuti?id=" + encodeURIComponent(id);
     });
   }
+
+
+  // === Modal Reset Password ===
+
+  let modalKonfirmasiResetPassword = document.getElementById("modalResetPassword");
+  if (modalKonfirmasiResetPassword) {
+    modalKonfirmasiResetPassword.addEventListener("show.bs.modal", function (event) {
+      let button = event.relatedTarget;
+      if (!button) return;
+
+      let id = button.getAttribute("data-id");
+      let nama = button.getAttribute("data-nama");
+
+      // Set nama user ke modal
+      let namaElem = document.getElementById("resetUserName");
+      if (namaElem) namaElem.textContent = nama;
+
+      // Set link reset dengan ID user
+      let btnReset = document.getElementById("btnReset");
+      if (btnReset) {
+        btnReset.href = "/app-perijinan/user_reset_password?id=" + encodeURIComponent(id);
+      }
+    });
+  }
+
+  // === Modal Nonaktifkan Pegawai ===
+  let modalNonaktifkan = document.getElementById("modalNonaktifkan");
+  if (modalNonaktifkan) {
+      modalNonaktifkan.addEventListener("show.bs.modal", function (event) {
+          let button = event.relatedTarget;
+          if (!button) return;
+
+          let id = button.getAttribute("data-id");
+          let nama = button.getAttribute("data-nama");
+
+          // Set nama user ke modal
+          let namaElem = document.getElementById("nonaktifUserName");
+          if (namaElem) {
+              namaElem.textContent = nama || "(Tidak ada nama)";
+          }
+
+          // Set link nonaktifkan
+          let btnNonaktifkan = document.getElementById("btnNonaktifkan");
+          if (btnNonaktifkan) {
+              btnNonaktifkan.href = "/app-perijinan/user_nonaktifkan?id=" + encodeURIComponent(id);
+          }
+      });
+  }
+
+
 });
 
 // <!-- Dynamic Footer Year -->

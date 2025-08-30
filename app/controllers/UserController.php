@@ -163,4 +163,56 @@ class UserController
             }
         }
     }
+
+    public function resetPassword()
+    {
+        if (!isset($_GET['id'])) {
+            $_SESSION['error'] = "ID user tidak ditemukan!";
+            header("Location: daftar_pegawai");
+            exit;
+        }
+
+        $userId = intval($_GET['id']);
+
+        // Opsional: cek apakah user ada
+        $user = $this->user->getUserById($userId);
+        if (!$user) {
+            $_SESSION['error'] = "User tidak ditemukan!";
+            header("Location: daftar_pegawai");
+            exit;
+        }
+
+        // Reset password
+        $success = $this->user->resetPasswordById($userId);
+
+        if ($success) {
+            $_SESSION['success'] = "Password user '{$user['nama']}' berhasil di-reset ke default (123456).";
+        } else {
+            $_SESSION['error'] = "Gagal mereset password user '{$user['nama']}'.";
+        }
+
+        header("Location: daftar_pegawai");
+        exit;
+    }
+
+    public function nonaktifkanUser()
+    {
+        if (!isset($_GET['id'])) {
+            $_SESSION['error'] = "ID user tidak ditemukan.";
+            header("Location: daftar_pegawai");
+            exit;
+        }
+
+        $id = (int) $_GET['id'];
+
+        if ($this->user->nonaktifkanById($id)) {
+            $_SESSION['success'] = "Pegawai berhasil dinonaktifkan.";
+        } else {
+            $_SESSION['error'] = "Gagal menonaktifkan pegawai.";
+        }
+
+        header("Location: daftar_pegawai");
+        exit;
+    }
+
 }

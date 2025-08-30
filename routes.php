@@ -30,7 +30,11 @@ function route($conn) {
         'edit_profil',
         'process_update_profil',
         'edit_password',
-        'process_update_password'
+        'process_update_password',
+        'user_reset_password',
+        'user_nonaktifkan',
+        'user_reset_password',
+        'user_nonaktifkan'
     ];
 
     // Redirect ke halaman login jika halaman yang diakses butuh autentikasi
@@ -50,7 +54,7 @@ function route($conn) {
         'hapus_perizinan'           => ['STF', 'KTA'],
         'daftar_perizinan'          => ['KTA', 'KEP'],
         'proses_perizinan'          => ['KTA', 'KEP'],
-        'laporan_perizinan'         => ['KTA', 'KEP'],
+        'laporan_perizinan'         => ['KTA', 'KEP', 'ADM'],
         'verifikasi'                => ['SCT'],
         'verify_keluar'             => ['SCT'],
         'verify_masuk'              => ['SCT'],
@@ -59,7 +63,7 @@ function route($conn) {
         'profil'                    => ['STF', 'KTA', 'KEP', 'SCT', 'ADM'],
         'leave_history'             => ['STF', 'KTA'],
         'proses_approval_cuti'      => ['KEP', 'KTA'],
-        'laporan_cuti'              => ['KEP', 'KTA'],
+        'laporan_cuti'              => ['KEP', 'KTA', 'ADM'],
         'user_add'                  => ['ADM'],
         'insert_user'               => ['ADM'],
         'user_edit'                 => ['ADM'],
@@ -67,7 +71,9 @@ function route($conn) {
         'edit_profil'               => ['STF', 'KTA', 'KEP'],
         'process_update_profil'     => ['STF', 'KTA', 'KEP'],
         'edit_password'             => ['STF', 'KTA', 'KEP', 'ADM'],
-        'process_update_password'   => ['STF', 'KTA', 'KEP', 'ADM']
+        'process_update_password'   => ['STF', 'KTA', 'KEP', 'ADM'],
+        'user_reset_password'       => ['ADM'],
+        'user_nonaktifkan'          => ['ADM']
     ];
 
     // Jika halaman memiliki batasan role, periksa apakah pengguna memiliki izin
@@ -122,6 +128,18 @@ function route($conn) {
             $controller->getUserDetail();
             break;
 
+        case 'user_reset_password':
+            require_once __DIR__ . '/app/controllers/UserController.php';
+            $controller = new UserController($conn);
+            $controller->resetPassword();
+            break;
+
+        case 'user_nonaktifkan':
+            require_once __DIR__ . '/app/controllers/UserController.php';
+            $controller = new UserController($conn);
+            $controller->nonaktifkanUser();
+            break;
+
         case 'ajukan_perizinan':
             require_once __DIR__ . '/app/controllers/PerizinanController.php';
             $controller = new PerizinanController($conn);
@@ -161,6 +179,13 @@ function route($conn) {
             $controller = new LaporanController($conn);
             $controller->laporanPerizinan();
             break;
+
+        case 'export_laporan_excel':
+            require_once __DIR__ . '/app/controllers/LaporanController.php';
+            $controller = new LaporanController($conn);
+            $controller->exportLaporanPerizinanExcel();
+            break;
+
 
         case 'verifikasi':
             require_once __DIR__ . '/app/controllers/LogController.php';
@@ -258,6 +283,12 @@ function route($conn) {
             require_once __DIR__ . '/app/controllers/LaporanController.php';
             $controller = new LaporanController($conn);
             $controller->laporanCuti();
+            break;
+
+        case 'export_laporan_cuti_excel':
+            require_once __DIR__ . '/app/controllers/LaporanController.php';
+            $controller = new LaporanController($conn);
+            $controller->exportLaporanCutiExcel();
             break;
         
         case 'cetak_cuti':

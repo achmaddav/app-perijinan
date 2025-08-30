@@ -95,8 +95,7 @@ class PerizinanModel {
     }
 
     public function getLaporanPerizinan($user_id, $jabatan, $month, $status, $pemohon, $limit, $offset) {
-        
-        // Dasar query 
+    // Dasar query
         $query = "SELECT 
                     p.id, 
                     u.nama AS nama_pemohon, 
@@ -114,55 +113,51 @@ class PerizinanModel {
                             MOD(SUM(TIMESTAMPDIFF(MINUTE, l.tanggal_keluar, l.tanggal_masuk)), 60), ' menit'
                         )
                     END AS total_waktu_keluar
-                  FROM perizinan p
-                  JOIN users u ON p.user_id = u.id
-                  LEFT JOIN users a ON p.approved_by = a.id
-                  LEFT JOIN log_keluar_masuk AS l ON l.perizinan_id = p.id
-                  WHERE DATE_FORMAT(p.created_at, '%Y-%m') = :month";
-        
-        // Jika jabatan Atasan, filter perizinan yang disetujui oleh user tersebut
-        if ($jabatan !== 'KEP') {
+                FROM perizinan p
+                JOIN users u ON p.user_id = u.id
+                LEFT JOIN users a ON p.approved_by = a.id
+                LEFT JOIN log_keluar_masuk AS l ON l.perizinan_id = p.id
+                WHERE DATE_FORMAT(p.created_at, '%Y-%m') = :month";
+
+        // Filter berdasarkan jabatan
+        $params = [ ':month' => $month ];
+
+        if ($jabatan !== 'ADM') {
+            // Selain ADM → filter approved_by
             $query .= " AND p.approved_by = :user_id";
-        }
-        
-        // Siapkan parameter dasar
-        $params = [
-            ':month' => $month
-        ];
-        
-        if ($jabatan !== 'KEP') {
             $params[':user_id'] = $user_id;
         }
-        
+
         // Tambahkan filter status jika diberikan
         if (!empty($status)) {
             $query .= " AND p.status = :status";
             $params[':status'] = $status;
         }
-        
+
         // Tambahkan filter nama pemohon jika diberikan
         if (!empty($pemohon)) {
             $query .= " AND u.nama LIKE :pemohon";
             $params[':pemohon'] = "%" . $pemohon . "%";
         }
-        
-        // Tambahkan GROUP BY karena kita menggunakan fungsi agregat
+
+        // Tambahkan GROUP BY karena ada agregasi
         $query .= " GROUP BY p.id";
-        
+
+        // Pagination
         $query .= " ORDER BY p.created_at DESC LIMIT :limit OFFSET :offset";
-        
+
         $stmt = $this->conn->prepare($query);
-        
+
         // Bind parameter dinamis
         foreach ($params as $key => $value) {
             $paramType = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
             $stmt->bindValue($key, $value, $paramType);
         }
-        
-        // Bind limit dan offset sebagai integer
+
+        // Bind limit dan offset
         $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
         $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
-        
+
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -258,5 +253,59 @@ class PerizinanModel {
         $stmt = $this->conn->prepare($query);
         return $stmt->execute([$id]);
     }
+
+    public function getLaporanPerizinanAll($user_id, $jabatan, $month, $status, $pemohon) {
+        $query = "SELECT 
+                    p.id, 
+                    u.nama AS nama_pemohon, 
+                    p.alasan, 
+                    p.status, 
+                    p.tanggal_rencana_keluar, 
+                    p.durasi_keluar, 
+                    a.nama AS nama_atasan, 
+                    p.created_at,
+                    CASE 
+                        WHEN SUM(TIMESTAMPDIFF(MINUTE, l.tanggal_keluar, l.tanggal_masuk)) < 60 
+                            THEN CONCAT(SUM(TIMESTAMPDIFF(MINUTE, l.tanggal_keluar, l.tanggal_masuk)), ' menit')
+                        ELSE CONCAT(
+                            FLOOR(SUM(TIMESTAMPDIFF(MINUTE, l.tanggal_keluar, l.tanggal_masuk)) / 60), ' jam ',
+                            MOD(SUM(TIMESTAMPDIFF(MINUTE, l.tanggal_keluar, l.tanggal_masuk)), 60), ' menit'
+                        )
+                    END AS total_waktu_keluar
+                FROM perizinan p
+                JOIN users u ON p.user_id = u.id
+                LEFT JOIN users a ON p.approved_by = a.id
+                LEFT JOIN log_keluar_masuk AS l ON l.perizinan_id = p.id
+                WHERE DATE_FORMAT(p.created_at, '%Y-%m') = :month";
+
+        $params = [':month' => $month];
+
+        // Filter hanya jika bukan ADM dan bukan KEP
+        if ($jabatan !== 'ADM' && $jabatan !== 'KEP') {
+            $query .= " AND p.approved_by = :user_id";
+            $params[':user_id'] = $user_id;
+        }
+
+        if (!empty($status)) {
+            $query .= " AND p.status = :status";
+            $params[':status'] = $status;
+        }
+
+        if (!empty($pemohon)) {
+            $query .= " AND u.nama LIKE :pemohon";
+            $params[':pemohon'] = "%" . $pemohon . "%";
+        }
+
+        $query .= " GROUP BY p.id ORDER BY p.created_at DESC";
+
+        $stmt = $this->conn->prepare($query);
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value, is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR);
+        }
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
 
 }

@@ -113,7 +113,7 @@
 
 <!-- Modal Konfirmasi Hapus -->
 <div class="modal fade" id="modalKonfirmasiCuti" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title text-danger" id="modalLabel"><i class="fas fa-exclamation-triangle"></i> Konfirmasi Hapus</h5>

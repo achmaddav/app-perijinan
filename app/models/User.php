@@ -42,6 +42,7 @@ class User {
                 LEFT JOIN jabatan j ON p.jabatan_id = j.id
                 LEFT JOIN divisitim d ON p.divisi_id = d.id
                 WHERE p.id != :id
+                    AND p.IsActive = 1 
                 ORDER BY p.nama ASC";
 
         $stmt = $this->conn->prepare($query);
@@ -172,6 +173,7 @@ class User {
                   INNER JOIN jabatan j ON u.jabatan_id = j.id
                   LEFT JOIN divisitim d ON u.divisi_id = d.id  
                   WHERE u.id = :id
+                    AND u.IsActive = 1
                   LIMIT 1";
                   
         $stmt = $this->conn->prepare($query);
@@ -403,5 +405,41 @@ class User {
             return false;
         }
     }
+
+    public function resetPasswordById($id)
+    {
+        $defaultPassword = "123456";
+        $hashedPassword = password_hash($defaultPassword, PASSWORD_BCRYPT);
+
+        try {
+            $sql = "UPDATE users SET password = :password WHERE id = :id";
+            $stmt = $this->conn->prepare($sql);
+
+            // Bind parameters
+            $stmt->bindParam(':password', $hashedPassword, PDO::PARAM_STR);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+
+            // Eksekusi
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log("Reset password gagal: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function nonaktifkanById($id)
+    {
+        try {
+            $sql = "UPDATE users SET IsActive = 0 WHERE id = :id";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log("Gagal nonaktifkan user: " . $e->getMessage());
+            return false;
+        }
+}
+
+
 }
 ?>

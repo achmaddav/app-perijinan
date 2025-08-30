@@ -52,7 +52,9 @@
                             </div>
                         </div>
                     </div>
+                <?php } ?>
 
+                <?php if ($jabatan === 'KEP' || $jabatan === 'KTA' || $jabatan === 'ADM') { ?>
                     <div class="col-lg-6 mb-4">
                         <div class="card shadow-sm border-0 rounded-4">
                             <div class="card-body">
@@ -63,6 +65,7 @@
                         </div>
                     </div>
                 <?php } ?>
+
                 </div>
             </div>
         </section>

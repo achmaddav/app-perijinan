@@ -49,6 +49,9 @@
                             <p>Daftar Perizinan</p>
                         </a>
                     </li>
+                <?php } ?>
+
+                <?php if ($jabatan === 'KTA' || $jabatan === 'KEP' || $jabatan === 'ADM') { ?>
                     <li class="nav-item">
                         <a href="/app-perijinan/laporan_perizinan" class="nav-link text-dark rounded-3">
                             <i class="nav-icon fas fa-file-alt text-danger"></i>
@@ -86,7 +89,7 @@
                 <?php } ?>
 
                 <!-- Menu cuti -->
-                <?php if ($jabatan !== 'SCT' && $jabatan !== 'ADM') { ?>
+                <?php if ($jabatan !== 'SCT') { ?>
                     <li class="nav-item">
                         <a href="/app-perijinan/dashboard_cuti" class="nav-link text-dark rounded-3">
                             <i class="nav-icon fas fa-clock text-warning"></i>
