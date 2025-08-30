@@ -67,12 +67,9 @@ class Cell
     /**
      * Attributes of the formula.
      *
-     * @var ?array
+     * @var mixed
      */
     private $formulaAttributes;
-
-    /** @var IgnoredErrors */
-    private $ignoredErrors;
 
     /**
      * Update the cell into the cell collection.
@@ -122,7 +119,6 @@ class Cell
         } elseif (self::getValueBinder()->bindValue($this, $value) === false) {
             throw new Exception('Value could not be bound to cell.');
         }
-        $this->ignoredErrors = new IgnoredErrors();
     }
 
     /**
@@ -395,9 +391,7 @@ class Cell
                 }
 
                 throw new \PhpOffice\PhpSpreadsheet\Calculation\Exception(
-                    $this->getWorksheet()->getTitle() . '!' . $this->getCoordinate() . ' -> ' . $ex->getMessage(),
-                    $ex->getCode(),
-                    $ex
+                    $this->getWorksheet()->getTitle() . '!' . $this->getCoordinate() . ' -> ' . $ex->getMessage()
                 );
             }
 
@@ -767,14 +761,26 @@ class Cell
         return $this->updateInCollection();
     }
 
-    public function setFormulaAttributes(?array $attributes): self
+    /**
+     * Set the formula attributes.
+     *
+     * @param mixed $attributes
+     *
+     * @return $this
+     */
+    public function setFormulaAttributes($attributes): self
     {
         $this->formulaAttributes = $attributes;
 
         return $this;
     }
 
-    public function getFormulaAttributes(): ?array
+    /**
+     * Get the formula attributes.
+     *
+     * @return mixed
+     */
+    public function getFormulaAttributes()
     {
         return $this->formulaAttributes;
     }
@@ -787,10 +793,5 @@ class Cell
     public function __toString()
     {
         return (string) $this->getValue();
-    }
-
-    public function getIgnoredErrors(): IgnoredErrors
-    {
-        return $this->ignoredErrors;
     }
 }
