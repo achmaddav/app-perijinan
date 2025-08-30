@@ -1,23 +1,19 @@
-function submitFormPDF() {
-  const form = document.getElementById("cetakForm");
-  const formData = new FormData(form);
+function submitFormPDF(id) {
+  const formData = new FormData(); // ✅ kosong, lalu append manual
+  formData.append("id", id);
 
-  const win = window.open("", "_blank"); // buka tab kosong
-
-  fetch(form.action, {
+  fetch("?page=cetak_cuti", {
     method: "POST",
     body: formData,
   })
     .then((res) => res.blob())
     .then((blob) => {
       const url = URL.createObjectURL(blob);
-      win.location.href = url;
+      window.open(url, "_blank");
     })
-    .catch((err) => {
-      win.document.write("Gagal memuat PDF.");
-      console.error(err);
-    });
+    .catch((err) => console.error(err));
 }
+
 
 // Tutup otomatis setelah 3 detik (3000 ms)
 setTimeout(() => {

@@ -82,15 +82,16 @@
                                                     <?php endif; ?>
                                                 </td>
                                                 <td class="text-center">
-                                                    <form id="cetakForm" method="POST" action="?page=cetak_cuti">
+                                                    <form id="cetakForm_<?= $leave['id']; ?>" method="POST" action="?page=cetak_cuti">
                                                         <input type="hidden" name="id" value="<?= $leave['id']; ?>">
-                                                        
-                                                        <?php if ($leave['status'] === 'Disetujui'): ?>
-                                                            <button type="button" onclick="submitFormPDF()" class="btn btn-primary btn-sm shadow-sm rounded-3">
-                                                                Cetak
-                                                            </button>
-                                                        <?php endif; ?>
                                                     </form>
+
+                                                    <button type="button" 
+                                                            onclick="submitFormPDF('<?= $leave['id']; ?>')" 
+                                                            class="btn btn-primary btn-sm shadow-sm rounded-3">
+                                                    Cetak
+                                                    </button>
+
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>

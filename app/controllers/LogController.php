@@ -27,8 +27,9 @@ class LogController
 
     public function verifyNonPerizinanList()
     {
+        $id = $_SESSION['user_id'];
         $nonIzinList = $this->perizinanNonApprovalModel->getNonPerizinanRequests();
-        $userList = $this->user->getAllUser();
+        $userList = $this->user->getAllUser($id);
         require_once __DIR__ . '/../views/satpam/verifikasi_non_perizinan.php';
     }
 

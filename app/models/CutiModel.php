@@ -40,48 +40,62 @@ class CutiModel {
     }
 
     // Mengambil riwayat perizinan berdasarkan user_id
-    public function getLeaveHistory($user_id) {
-        $query = "SELECT 
-                    ab.nama AS tahap_1,
-                    kep.nama AS tahap_2,
-                    DATEDIFF(c.tanggal_selesai, c.tanggal_mulai) + 1 AS jumlah_cuti,
-                    c.* 
-                FROM cuti c
-                LEFT JOIN users ab ON c.approved_by = ab.id 
-                INNER JOIN users kep ON c.final_approved_by = kep.id
-                WHERE c.user_id = :user_id
-                ORDER BY c.created_at DESC";
-
+    public function getLeaveHistory($user_id)
+    {
+        $query = "
+            SELECT 
+                COALESCE(ab.nama, '-') AS tahap_1,
+                COALESCE(kep.nama, '-') AS tahap_2,
+                (
+                    SELECT COUNT(*)
+                    FROM calendar cal
+                    WHERE cal.tanggal BETWEEN c.tanggal_mulai AND c.tanggal_selesai
+                    AND cal.is_weekend = 0
+                    AND cal.is_dayoff = 0
+                ) AS jumlah_cuti,
+                c.*
+            FROM cuti c
+            LEFT JOIN users ab ON c.approved_by = ab.id 
+            LEFT JOIN users kep ON c.final_approved_by = kep.id
+            WHERE c.user_id = :user_id
+            ORDER BY c.created_at DESC
+        ";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
         $stmt->execute();
-        
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }  
 
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+ 
     // Mengambil jumlah sisa cuti
-   public function getLeaveRemaining($user_id) {
+    public function getLeaveRemaining($user_id) {
         $jatahCutiTahunan = 12;
 
         $query = "
-            SELECT 
-                SUM(
-                    DATEDIFF(
-                        LEAST(ct.tanggal_selesai, DATE_FORMAT(NOW(), '%Y-12-31')),
-                        GREATEST(ct.tanggal_mulai, DATE_FORMAT(NOW(), '%Y-01-01'))
-                    ) + 1
-                ) AS cutiDipakai
-            FROM cuti ct
-            INNER JOIN tipe_cuti tc ON tc.id = ct.tipe_cuti_id
-            WHERE ct.status = 'Disetujui' 
+            WITH RECURSIVE tanggal AS (
+                SELECT GREATEST(ct.tanggal_mulai, DATE_FORMAT(NOW(), '%Y-01-01')) AS tgl, 
+                    LEAST(ct.tanggal_selesai, DATE_FORMAT(NOW(), '%Y-12-31')) AS tgl_akhir
+                FROM cuti ct
+                INNER JOIN tipe_cuti tc ON tc.id = ct.tipe_cuti_id
+                WHERE ct.status = 'Disetujui'
                 AND tc.kode_cuti = 'CT'
                 AND ct.user_id = :user_id
-                AND (
-                    ct.tanggal_mulai <= DATE_FORMAT(NOW(), '%Y-12-31') AND
-                    ct.tanggal_selesai >= DATE_FORMAT(NOW(), '%Y-01-01')
-                )
-        ";
+                AND ct.tanggal_mulai <= DATE_FORMAT(NOW(), '%Y-12-31')
+                AND ct.tanggal_selesai >= DATE_FORMAT(NOW(), '%Y-01-01')
+
+                UNION ALL
+
+                SELECT DATE_ADD(tgl, INTERVAL 1 DAY), tgl_akhir
+                FROM tanggal
+                WHERE tgl < tgl_akhir
+            )
+            SELECT COUNT(*) AS cutiDipakai
+            FROM tanggal t
+            LEFT JOIN dayoff d ON t.tgl = d.tanggal
+            WHERE DAYOFWEEK(t.tgl) NOT IN (1,7)   -- exclude sabtu (7) & minggu (1)
+            AND d.tanggal IS NULL;              -- exclude tanggal libur nasional
+            ";
 
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
@@ -164,7 +178,13 @@ class CutiModel {
                         c.status, 
                         c.tanggal_mulai,
                         c.tanggal_selesai, 
-                        DATEDIFF(c.tanggal_selesai, c.tanggal_mulai) + 1 AS lama_cuti,
+                        (
+                            SELECT COUNT(*)
+                            FROM calendar cal
+                            WHERE cal.tanggal BETWEEN c.tanggal_mulai AND c.tanggal_selesai
+                            AND cal.is_weekend = 0
+                            AND cal.is_dayoff = 0
+                        ) AS lama_cuti,
                         a.nama AS approver, 
                         DATE(c.created_at) AS tanggal_pengajuan
                     FROM cuti c
@@ -180,7 +200,13 @@ class CutiModel {
                         c.status, 
                         c.tanggal_mulai,
                         c.tanggal_selesai, 
-                        DATEDIFF(c.tanggal_selesai, c.tanggal_mulai) + 1 AS lama_cuti,
+                        (
+                            SELECT COUNT(*)
+                            FROM calendar cal
+                            WHERE cal.tanggal BETWEEN c.tanggal_mulai AND c.tanggal_selesai
+                            AND cal.is_weekend = 0
+                            AND cal.is_dayoff = 0
+                        ) AS lama_cuti,
                         a.nama AS approver, 
                         DATE(c.created_at) AS tanggal_pengajuan
                     FROM cuti c
@@ -283,7 +309,13 @@ class CutiModel {
                 u.tanggal_mulai_kerja,
                 TIMESTAMPDIFF(YEAR, u.tanggal_mulai_kerja, CURDATE()) AS tahun_masa_kerja,
                 MOD(TIMESTAMPDIFF(MONTH, u.tanggal_mulai_kerja, CURDATE()), 12) AS bulan_masa_kerja,
-                DATEDIFF(c.tanggal_selesai, c.tanggal_mulai) + 1 AS lama_cuti,
+                (
+                    SELECT COUNT(*)
+                    FROM calendar cal
+                    WHERE cal.tanggal BETWEEN c.tanggal_mulai AND c.tanggal_selesai
+                        AND cal.is_weekend = 0
+                        AND cal.is_dayoff = 0
+                ) AS lama_cuti,
                 a.nama AS approver,
                 tc.kode_cuti,
 
@@ -309,20 +341,64 @@ class CutiModel {
             LEFT JOIN (
                 SELECT 
                     cct.user_id,
-                    SUM(CASE WHEN YEAR(cct.tanggal_mulai) = YEAR(CURDATE())     THEN DATEDIFF(cct.tanggal_selesai, cct.tanggal_mulai) + 1 ELSE 0 END) AS total_n_0,
-                    SUM(CASE WHEN YEAR(cct.tanggal_mulai) = YEAR(CURDATE()) - 1 THEN DATEDIFF(cct.tanggal_selesai, cct.tanggal_mulai) + 1 ELSE 0 END) AS total_n_1,
-                    SUM(CASE WHEN YEAR(cct.tanggal_mulai) = YEAR(CURDATE()) - 2 THEN DATEDIFF(cct.tanggal_selesai, cct.tanggal_mulai) + 1 ELSE 0 END) AS total_n_2
+                    SUM(
+                        CASE 
+                            WHEN YEAR(cct.tanggal_mulai) = YEAR(CURDATE())
+                            THEN (
+                                SELECT COUNT(*) 
+                                FROM calendar cal
+                                WHERE cal.tanggal BETWEEN cct.tanggal_mulai AND cct.tanggal_selesai
+                                AND cal.is_weekend = 0
+                                AND cal.is_dayoff = 0
+                            ) ELSE 0 
+                        END
+                    ) AS total_n_0,
+                    SUM(
+                        CASE 
+                            WHEN YEAR(cct.tanggal_mulai) = YEAR(CURDATE()) - 1
+                            THEN (
+                                SELECT COUNT(*) 
+                                FROM calendar cal
+                                WHERE cal.tanggal BETWEEN cct.tanggal_mulai AND cct.tanggal_selesai
+                                AND cal.is_weekend = 0
+                                AND cal.is_dayoff = 0
+                            ) ELSE 0 
+                        END
+                    ) AS total_n_1,
+                    SUM(
+                        CASE 
+                            WHEN YEAR(cct.tanggal_mulai) = YEAR(CURDATE()) - 2
+                            THEN (
+                                SELECT COUNT(*) 
+                                FROM calendar cal
+                                WHERE cal.tanggal BETWEEN cct.tanggal_mulai AND cct.tanggal_selesai
+                                AND cal.is_weekend = 0
+                                AND cal.is_dayoff = 0
+                            ) ELSE 0 
+                        END
+                    ) AS total_n_2
                 FROM cuti cct
                 INNER JOIN tipe_cuti tcct ON tcct.id = cct.tipe_cuti_id
-                WHERE cct.status = 'Disetujui' AND tcct.kode_cuti = 'CT'
+                WHERE cct.status = 'Disetujui'
+                AND tcct.kode_cuti = 'CT'
+                AND cct.tanggal_selesai <= (SELECT tanggal_selesai FROM cuti WHERE id = :id)
                 GROUP BY cct.user_id
             ) ct ON ct.user_id = c.user_id
+   
 
             -- Subquery total cuti besar tahun ini
             LEFT JOIN (
                 SELECT 
                     ccb.user_id,
-                    SUM(DATEDIFF(ccb.tanggal_selesai, ccb.tanggal_mulai) + 1) AS total_cb
+                    SUM(
+                        (
+                            SELECT COUNT(*)
+                            FROM calendar cal
+                            WHERE cal.tanggal BETWEEN ccb.tanggal_mulai AND ccb.tanggal_selesai
+                            AND cal.is_weekend = 0
+                            AND cal.is_dayoff = 0
+                        )
+                    ) AS total_cb
                 FROM cuti ccb
                 INNER JOIN tipe_cuti tccb ON tccb.id = ccb.tipe_cuti_id
                 WHERE ccb.status = 'Disetujui'
@@ -331,11 +407,20 @@ class CutiModel {
                 GROUP BY ccb.user_id
             ) cb ON cb.user_id = c.user_id
 
+
             -- Subquery total cuti sakit tahun ini
             LEFT JOIN (
                 SELECT 
                     ccs.user_id,
-                    SUM(DATEDIFF(ccs.tanggal_selesai, ccs.tanggal_mulai) + 1) AS total_cs
+                    SUM(
+                        (
+                            SELECT COUNT(*)
+                            FROM calendar cal
+                            WHERE cal.tanggal BETWEEN ccs.tanggal_mulai AND ccs.tanggal_selesai
+                            AND cal.is_weekend = 0
+                            AND cal.is_dayoff = 0
+                        )
+                    ) AS total_cs
                 FROM cuti ccs
                 INNER JOIN tipe_cuti tccs ON tccs.id = ccs.tipe_cuti_id
                 WHERE ccs.status = 'Disetujui'
@@ -348,7 +433,15 @@ class CutiModel {
             LEFT JOIN (
                 SELECT 
                     ccm.user_id,
-                    SUM(DATEDIFF(ccm.tanggal_selesai, ccm.tanggal_mulai) + 1) AS total_cm
+                    SUM(
+                        (
+                            SELECT COUNT(*)
+                            FROM calendar cal
+                            WHERE cal.tanggal BETWEEN ccm.tanggal_mulai AND ccm.tanggal_selesai
+                            AND cal.is_weekend = 0
+                            AND cal.is_dayoff = 0
+                        )
+                    ) AS total_cm
                 FROM cuti ccm
                 INNER JOIN tipe_cuti tccm ON tccm.id = ccm.tipe_cuti_id
                 WHERE ccm.status = 'Disetujui'
@@ -361,7 +454,15 @@ class CutiModel {
             LEFT JOIN (
                 SELECT 
                     cckap.user_id,
-                    SUM(DATEDIFF(cckap.tanggal_selesai, cckap.tanggal_mulai) + 1) AS total_ckap
+                    SUM(
+                        (
+                            SELECT COUNT(*)
+                            FROM calendar cal
+                            WHERE cal.tanggal BETWEEN cckap.tanggal_mulai AND cckap.tanggal_selesai
+                            AND cal.is_weekend = 0
+                            AND cal.is_dayoff = 0
+                        )
+                    ) AS total_ckap
                 FROM cuti cckap
                 INNER JOIN tipe_cuti tcckap ON tcckap.id = cckap.tipe_cuti_id
                 WHERE cckap.status = 'Disetujui'
@@ -374,7 +475,15 @@ class CutiModel {
             LEFT JOIN (
                 SELECT 
                     ccltn.user_id,
-                    SUM(DATEDIFF(ccltn.tanggal_selesai, ccltn.tanggal_mulai) + 1) AS total_cltn
+                    SUM(
+                        (
+                            SELECT COUNT(*)
+                            FROM calendar cal
+                            WHERE cal.tanggal BETWEEN ccltn.tanggal_mulai AND ccltn.tanggal_selesai
+                            AND cal.is_weekend = 0
+                            AND cal.is_dayoff = 0
+                        )
+                    ) AS total_cltn
                 FROM cuti ccltn
                 INNER JOIN tipe_cuti tccltn ON tccltn.id = ccltn.tipe_cuti_id
                 WHERE ccltn.status = 'Disetujui'
@@ -383,11 +492,12 @@ class CutiModel {
                 GROUP BY ccltn.user_id
             ) cltn ON cltn.user_id = c.user_id
 
-            WHERE c.id = ?
+            WHERE c.id = :id
         ";
 
         $stmt = $this->conn->prepare($query);
-        $stmt->execute([$id]);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 

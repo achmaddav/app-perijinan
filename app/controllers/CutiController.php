@@ -636,13 +636,20 @@ class CutiController
         // Contoh: 10 x 13 inch (custom size lebih lebar dari letter)
         $customPaper = [0, 0, 720, 1070]; // 72 pt x inci
         $dompdf->setPaper($customPaper, 'portrait');
-        // Set ukuran kertas ke 'letter'
-        // $dompdf->setPaper('legal', 'portrait');
+        // Atau: $dompdf->setPaper('legal', 'portrait');
 
-        // Render dan keluarkan PDF
+        // Render PDF
         $dompdf->render();
-        $dompdf->stream('Formulir-Cuti.pdf', ['Attachment' => false]); // tampil di browser
+
+        // 🔽 Kirim output ke browser
+        $pdfOutput = $dompdf->output();
+
+        header("Content-Type: application/pdf");
+        header("Content-Disposition: inline; filename=Formulir-Cuti.pdf");
+        echo $pdfOutput;
+        exit;
     }
+
 
     public function hapusCuti()
     {
