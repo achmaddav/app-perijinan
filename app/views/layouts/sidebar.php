@@ -98,6 +98,23 @@
                     </li>
                 <?php } ?>
 
+                <?php if ($jabatan === 'ADM') { ?>
+                    <li class="nav-item">
+                        <a href="/app-perijinan/calendar" class="nav-link text-dark rounded-3">
+                            <i class="nav-icon fas fa-calendar-alt text-primary"></i>
+                            <p>Kalender</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="/app-perijinan/dayoff" class="nav-link text-dark rounded-3">
+                            <i class="nav-icon fas fa-calendar-day text-success"></i>
+                            <p>Dayoff</p>
+                        </a>
+                    </li>
+
+                <?php } ?>
+
                 <!-- Logout dengan Popup Konfirmasi -->
                 <li class="nav-item">
                     <a href="#" class="nav-link text-danger" data-bs-toggle="modal" data-bs-target="#logoutModal">

@@ -43,6 +43,37 @@ $(document).ready(function () {
       },
     },
   });
+
+  $('#calendarTable').DataTable({
+      "pageLength": 10,
+      "lengthMenu": [10, 25, 50, 100],
+      "ordering": true,
+      "searching": true,
+      "info": true,
+      "autoWidth": false
+  });
+
+  $('#table-dayoff').DataTable({
+        "lengthMenu": [[10, 25, 50, 100], [10, 25, 50, 100]],
+        "pageLength": 10,
+        "language": {
+            "search": "Cari:",
+            "lengthMenu": "Tampilkan _MENU_ baris",
+            "zeroRecords": "Data tidak ditemukan",
+            "info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+            "infoEmpty": "Menampilkan 0 sampai 0 dari 0 data",
+            "infoFiltered": "(difilter dari _MAX_ total data)",
+            "paginate": {
+                "first": "Pertama",
+                "last": "Terakhir",
+                "next": "Selanjutnya",
+                "previous": "Sebelumnya"
+            }
+        },
+        "columnDefs": [
+            { "orderable": false, "targets": 3 } 
+        ]
+    });
 });
 
 document.addEventListener("DOMContentLoaded", function () {

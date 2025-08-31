@@ -34,7 +34,14 @@ function route($conn) {
         'user_reset_password',
         'user_nonaktifkan',
         'user_reset_password',
-        'user_nonaktifkan'
+        'user_nonaktifkan',
+        'calendar',
+        'generate_calendar',
+        'calendar_sync',
+        'dayoff',
+        'dayoff_create',
+        'dayoff_edit',
+        'dayoff_delete'
     ];
 
     // Redirect ke halaman login jika halaman yang diakses butuh autentikasi
@@ -73,7 +80,14 @@ function route($conn) {
         'edit_password'             => ['STF', 'KTA', 'KEP', 'ADM'],
         'process_update_password'   => ['STF', 'KTA', 'KEP', 'ADM'],
         'user_reset_password'       => ['ADM'],
-        'user_nonaktifkan'          => ['ADM']
+        'user_nonaktifkan'          => ['ADM'],
+        'calendar'                  => ['ADM'],
+        'generate_calendar'         => ['ADM'],
+        'calendar_sync'             => ['ADM'],
+        'dayoff'                    => ['ADM'],
+        'dayoff_create'             => ['ADM'],
+        'dayoff_edit'               => ['ADM'],
+        'dayoff_delete'             => ['ADM']
     ];
 
     // Jika halaman memiliki batasan role, periksa apakah pengguna memiliki izin
@@ -372,6 +386,59 @@ function route($conn) {
                 $controller->editPassword();
             }
             break;
+
+        case 'calendar':
+            require_once __DIR__ . '/app/controllers/CalendarController.php';
+            $controller = new CalendarController($conn);
+            $controller->index();
+            break;
+
+        case 'generate_calendar':
+            require_once __DIR__ . '/app/controllers/CalendarController.php';
+            $controller = new CalendarController($conn);
+            $controller->generate();
+            break;
+            
+        case 'calendar_sync':
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                require_once __DIR__ . '/app/controllers/CalendarController.php';
+                $controller = new CalendarController($conn);
+                $controller->syncDayoff();
+            }
+            break;
+
+        case 'calendar_unsync':
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                require_once __DIR__ . '/app/controllers/CalendarController.php';
+                $controller = new CalendarController($conn);
+                $controller->unsyncDayoff();
+            }
+            break;
+
+        case 'dayoff':
+            require_once __DIR__ . '/app/controllers/DayoffController.php';
+            $controller = new DayoffController($conn);
+            $controller->index();
+            break;
+
+        case 'dayoff_create':
+            require_once __DIR__ . '/app/controllers/DayoffController.php';
+            $controller = new DayoffController($conn);
+            $controller->create();
+            break;
+
+        case 'dayoff_edit':
+            require_once __DIR__ . '/app/controllers/DayoffController.php';
+            $controller = new DayoffController($conn);
+            $controller->edit();
+            break;
+
+        case 'dayoff_delete':
+            require_once __DIR__ . '/app/controllers/DayoffController.php';
+            $controller = new DayoffController($conn);
+            $controller->delete();
+            break;
+
 
         default:
             echo "Halaman tidak ditemukan!";
