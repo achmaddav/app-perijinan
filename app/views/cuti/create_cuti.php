@@ -70,7 +70,7 @@
                                                 <label for="nama_pengaju" class="col-md-4 col-form-label">Nama Pemohon</label>
                                                 <div class="col-md-8">
                                                     <input type="text" class="form-control shadow-sm" id="nama_pengaju"
-                                                        value="<?= $_SESSION['nama'] ?? 'Guest'; ?>" disabled>
+                                                        value="<?= isset($_SESSION['nama']) ? $_SESSION['nama'] : 'Guest'; ?>" disabled>
                                                 </div>
                                             </div>
 
@@ -78,7 +78,7 @@
                                                 <label for="nip" class="col-md-4 col-form-label">NIP</label>
                                                 <div class="col-md-8">
                                                     <input type="text" class="form-control shadow-sm" id="nip"
-                                                        value="<?= $_SESSION['nip'] ?? '-'; ?>" disabled>
+                                                        value="<?= isset($_SESSION['nip']) ? $_SESSION['nip'] : '-'; ?>" disabled>
                                                 </div>
                                             </div>
 

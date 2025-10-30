@@ -51,13 +51,15 @@
                                                 <td>
                                                     <?php
                                                         $status = htmlspecialchars($izin['status']);
-                                                        $badgeClass = match ($status) {
-                                                            'Disetujui' => 'badge bg-success',
-                                                            'Ditolak' => 'badge bg-danger',
-                                                            default => 'badge bg-warning text-dark',
-                                                        };
+                                                        if ($status === 'Disetujui') {
+                                                            $badgeClass = 'badge bg-success';
+                                                        } elseif ($status === 'Ditolak') {
+                                                            $badgeClass = 'badge bg-danger';
+                                                        } else {
+                                                            $badgeClass = 'badge bg-warning text-dark';
+                                                        }
                                                     ?>
-                                                    <span class="<?= $badgeClass; ?>"><?= $status; ?></span>
+                                                    <span class="<?php echo $badgeClass; ?>"><?php echo $status; ?></span>
                                                 </td>
                                                 <td><?= htmlspecialchars($izin['created_at']); ?></td>
                                                 <td>

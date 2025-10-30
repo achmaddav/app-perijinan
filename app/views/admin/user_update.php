@@ -99,10 +99,12 @@
                                             <div class="row mb-3">
                                                 <label class="col-md-4 col-form-label">Jabatan</label>
                                                 <div class="col-md-8">
-                                                    <select name="jenisJabatan" class="form-select">
+                                                    <select name="jenisJabatan" id="jenisJabatan" class="form-select" required>
                                                         <option value="">-- Tidak Ada --</option>
                                                         <?php foreach ($positions as $pos): ?>
-                                                            <option value="<?= $pos['id']; ?>" <?= $user['jabatan_id']==$pos['id'] ? 'selected' : ''; ?>>
+                                                            <option value="<?= $pos['id']; ?>" 
+                                                                    data-kode="<?= htmlspecialchars($pos['kode']); ?>"
+                                                                    <?= $user['jabatan_id']==$pos['id'] ? 'selected' : ''; ?>>
                                                                 <?= htmlspecialchars($pos['nama']); ?>
                                                             </option>
                                                         <?php endforeach; ?>
@@ -127,7 +129,7 @@
                                             <div class="row mb-3">
                                                 <label class="col-md-4 col-form-label">Ketua Tim</label>
                                                 <div class="col-md-8">
-                                                    <select name="ketua_timker" class="form-select">
+                                                    <select name="ketua_timker" id="ketua_timker" class="form-select">
                                                         <option value="">-- Tidak Ada --</option>
                                                         <?php foreach ($ketua_tim_list as $kt): ?>
                                                             <option value="<?= $kt['id']; ?>" <?= $user['atasan_id']==$kt['id'] ? 'selected' : ''; ?>>
@@ -164,7 +166,7 @@
 
                                     <!-- BUTTON -->
                                     <div class="text-end">
-                                        <button type="submit" class="btn btn-warning">
+                                        <button type="submit" class="btn btn-sm btn-warning">
                                             <i class="fa fa-save me-2"></i> Update
                                         </button>
                                     </div>
@@ -189,4 +191,5 @@
     }
 </style>
 
+<script src="/app-perijinan/assets/js/admin/user_update.js?v=<?= time(); ?>"></script>
 <?php include  __DIR__ . '/../layouts/footer.php'; ?>

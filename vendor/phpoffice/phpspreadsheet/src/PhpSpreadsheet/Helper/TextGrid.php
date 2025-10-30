@@ -52,7 +52,7 @@ class TextGrid
 
         $maxRow = max($this->rows);
         $maxRowLength = strlen((string) $maxRow) + 1;
-        $columnWidths = $this->getColumnWidths();
+        $columnWidths = $this->getColumnWidths($this->matrix);
 
         $this->renderColumnHeader($maxRowLength, $columnWidths);
         $this->renderRows($maxRowLength, $columnWidths);
@@ -108,7 +108,7 @@ class TextGrid
         $this->gridDisplay .= '+' . PHP_EOL;
     }
 
-    private function getColumnWidths(): array
+    private function getColumnWidths(array $matrix): array
     {
         $columnCount = count($this->matrix, COUNT_RECURSIVE) / count($this->matrix);
         $columnWidths = [];

@@ -3,7 +3,7 @@ class Database {
     private static $instance = null;
     private $conn;
     private $host = "localhost";
-    private $db_name = "bptupeijinandb";
+    private $db_name = "bptupeijinandb_new";
     private $username = "root";
     private $password = "";
 

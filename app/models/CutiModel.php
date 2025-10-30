@@ -72,42 +72,52 @@ class CutiModel {
     public function getLeaveRemaining($user_id) {
         $jatahCutiTahunan = 12;
 
+        // Ambil semua cuti user di tahun berjalan
         $query = "
-            WITH RECURSIVE tanggal AS (
-                SELECT GREATEST(ct.tanggal_mulai, DATE_FORMAT(NOW(), '%Y-01-01')) AS tgl, 
-                    LEAST(ct.tanggal_selesai, DATE_FORMAT(NOW(), '%Y-12-31')) AS tgl_akhir
-                FROM cuti ct
-                INNER JOIN tipe_cuti tc ON tc.id = ct.tipe_cuti_id
-                WHERE ct.status = 'Disetujui'
-                AND tc.kode_cuti = 'CT'
-                AND ct.user_id = :user_id
-                AND ct.tanggal_mulai <= DATE_FORMAT(NOW(), '%Y-12-31')
-                AND ct.tanggal_selesai >= DATE_FORMAT(NOW(), '%Y-01-01')
-
-                UNION ALL
-
-                SELECT DATE_ADD(tgl, INTERVAL 1 DAY), tgl_akhir
-                FROM tanggal
-                WHERE tgl < tgl_akhir
-            )
-            SELECT COUNT(*) AS cutiDipakai
-            FROM tanggal t
-            LEFT JOIN dayoff d ON t.tgl = d.tanggal
-            WHERE DAYOFWEEK(t.tgl) NOT IN (1,7)   -- exclude sabtu (7) & minggu (1)
-            AND d.tanggal IS NULL;              -- exclude tanggal libur nasional
-            ";
-
+            SELECT ct.tanggal_mulai, ct.tanggal_selesai
+            FROM cuti ct
+            INNER JOIN tipe_cuti tc ON tc.id = ct.tipe_cuti_id
+            WHERE ct.status = 'Disetujui'
+            AND tc.kode_cuti = 'CT'
+            AND ct.user_id = :user_id
+            AND ct.tanggal_mulai <= DATE_FORMAT(NOW(), '%Y-12-31')
+            AND ct.tanggal_selesai >= DATE_FORMAT(NOW(), '%Y-01-01')
+        ";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
         $stmt->execute();
-        
-        $cutiDipakai = $stmt->fetchColumn();
-        $cutiDipakai = $cutiDipakai !== false && $cutiDipakai !== null ? (int)$cutiDipakai : 0;
+        $cutiList = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Ambil daftar hari libur nasional
+        $stmtLibur = $this->conn->query("SELECT tanggal FROM dayoff");
+        $hariLibur = $stmtLibur->fetchAll(PDO::FETCH_COLUMN, 0);
+        $hariLibur = array_map(function($tgl) {
+            return date('Y-m-d', strtotime($tgl));
+        }, $hariLibur);
+
+        $cutiDipakai = 0;
+
+        foreach ($cutiList as $cuti) {
+            $start = new DateTime(max($cuti['tanggal_mulai'], date('Y-01-01')));
+            $end   = new DateTime(min($cuti['tanggal_selesai'], date('Y-12-31')));
+
+            // Loop semua hari di rentang cuti
+            while ($start <= $end) {
+                $hari = $start->format('Y-m-d');
+                $dayOfWeek = $start->format('N'); // 1=Senin ... 7=Minggu
+
+                if ($dayOfWeek < 6 && !in_array($hari, $hariLibur)) {
+                    $cutiDipakai++;
+                }
+
+                $start->modify('+1 day');
+            }
+        }
 
         $sisaCuti = $jatahCutiTahunan - $cutiDipakai;
-
         return max(0, $sisaCuti);
     }
+
 
     
     // Ambil semua cuti yang belum diproses oleh atasan
@@ -367,6 +377,11 @@ class CutiModel {
                 u.nip, 
                 u.phone_number,
                 CONCAT(j.nama, ' ', dt.nama) AS jabatan,
+                j.kode AS kode_jabatan,
+                a.nama AS nama_ketua,
+                a.nip AS nip_ketua,
+                kep.nama AS nama_kepala,
+                kep.nip AS nip_kepala,
                 u.tanggal_mulai_kerja,
                 TIMESTAMPDIFF(YEAR, u.tanggal_mulai_kerja, CURDATE()) AS tahun_masa_kerja,
                 MOD(TIMESTAMPDIFF(MONTH, u.tanggal_mulai_kerja, CURDATE()), 12) AS bulan_masa_kerja,
@@ -394,6 +409,7 @@ class CutiModel {
             FROM cuti c
             INNER JOIN users u ON u.id = c.user_id
             LEFT JOIN users a ON a.id = c.approved_by
+            LEFT JOIN users kep ON kep.id = c.final_approved_by
             INNER JOIN jabatan j ON u.jabatan_id = j.id
             INNER JOIN divisitim dt ON u.divisi_id = dt.id 
             INNER JOIN tipe_cuti tc ON tc.id = c.tipe_cuti_id

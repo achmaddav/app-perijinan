@@ -1,8 +1,20 @@
 <!-- Sidebar -->
 <aside class="main-sidebar bg-white shadow-sm rounded-4">
-    <a href="#" class="brand-link text-decoration-none text-center d-block border-bottom">
-        <span class="brand-text font-weight-bold text-primary">Aplikasi Perizinan</span>
+    <a href="#" class="brand-link d-flex align-items-center text-decoration-none border-bottom py-2">
+        <!-- Logo -->
+        <img src="assets/image/logo.png" alt="Logo" 
+            class="brand-image img-circle elevation-3" 
+            style="opacity:.9; width:40px; height:40px;">
+
+        <!-- Teks Judul -->
+        <div class="d-flex flex-column ms-2">
+            <span class="brand-text font-weight-bold text-primary fs-6" style="text-align: left;">
+                Aplikasi Perizinan
+            </span>
+            <small class="text-secondary fs-7">BPTU Sembawa</small>
+        </div>
     </a>
+
     <div class="sidebar">
         <nav class="mt-3">
             <ul class="nav nav-pills nav-sidebar flex-column">
@@ -58,6 +70,13 @@
                             <p>Laporan Perizinan</p>
                         </a>
                     </li>
+
+                    <li class="nav-item">
+                        <a href="/app-perijinan/laporan_non_perizinan" class="nav-link text-dark rounded-3">
+                            <i class="nav-icon fas fa-file-alt text-danger"></i>
+                            <p>Laporan Tak Berizin</p>
+                        </a>
+                    </li>
                 <?php } ?>
 
                 <!-- Menu untuk Satpam -->
@@ -99,6 +118,20 @@
                 <?php } ?>
 
                 <?php if ($jabatan === 'ADM') { ?>
+                    <li class="nav-item">
+                        <a href="/app-perijinan/index_jabatan" class="nav-link text-dark rounded-3">
+                            <i class="nav-icon fas fa-user-tie text-primary"></i>
+                            <p>Jabatan</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="/app-perijinan/index_divisi" class="nav-link text-dark rounded-3">
+                            <i class="nav-icon fas fa-sitemap text-primary"></i>
+                            <p>Divisi</p>
+                        </a>
+                    </li>
+
                     <li class="nav-item">
                         <a href="/app-perijinan/calendar" class="nav-link text-dark rounded-3">
                             <i class="nav-icon fas fa-calendar-alt text-primary"></i>

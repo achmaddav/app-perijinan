@@ -56,11 +56,13 @@
                                                 <td><?= htmlspecialchars($leave['tahap_2']); ?></td>
                                                 <td>
                                                     <?php
-                                                        $statusClass = match ($leave['status']) {
-                                                            'Disetujui' => 'badge bg-success',
-                                                            'Ditolak' => 'badge bg-danger',
-                                                            default => 'badge bg-warning text-dark',
-                                                        };
+                                                    if ($leave['status'] === 'Disetujui') {
+                                                        $statusClass = 'badge bg-success';
+                                                    } elseif ($leave['status'] === 'Ditolak') {
+                                                        $statusClass = 'badge bg-danger';
+                                                    } else {
+                                                        $statusClass = 'badge bg-warning text-dark';
+                                                    }
                                                     ?>
                                                     <span class="<?= $statusClass; ?>"><?= htmlspecialchars($leave['status']); ?></span>
                                                 </td>

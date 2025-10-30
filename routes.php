@@ -14,6 +14,7 @@ function route($conn) {
         'daftar_perizinan',
         'proses_perizinan',
         'laporan_perizinan',
+        'laporan_non_perizinan',
         'verifikasi',
         'verify_keluar',
         'verify_masuk',
@@ -41,7 +42,16 @@ function route($conn) {
         'dayoff',
         'dayoff_create',
         'dayoff_edit',
-        'dayoff_delete'
+        'dayoff_delete',
+        'user_import_excel',
+        'index_jabatan',
+        'add_jabatan',
+        'edit_jabatan',
+        'delete_jabatan',
+        'index_divisi',
+        'add_divisi',
+        'edit_divisi',
+        'delete_divisi'
     ];
 
     // Redirect ke halaman login jika halaman yang diakses butuh autentikasi
@@ -62,6 +72,7 @@ function route($conn) {
         'daftar_perizinan'          => ['KTA', 'KEP'],
         'proses_perizinan'          => ['KTA', 'KEP'],
         'laporan_perizinan'         => ['KTA', 'KEP', 'ADM'],
+        'laporan_non_perizinan'     => ['KTA', 'KEP', 'ADM'],
         'verifikasi'                => ['SCT'],
         'verify_keluar'             => ['SCT'],
         'verify_masuk'              => ['SCT'],
@@ -75,8 +86,8 @@ function route($conn) {
         'insert_user'               => ['ADM'],
         'user_edit'                 => ['ADM'],
         'process_user_update'       => ['ADM', 'KEP'],
-        'edit_profil'               => ['STF', 'KTA', 'KEP'],
-        'process_update_profil'     => ['STF', 'KTA', 'KEP'],
+        'edit_profil'               => ['STF', 'KTA', 'KEP', 'ADM'],
+        'process_update_profil'     => ['STF', 'KTA', 'KEP', 'ADM'],
         'edit_password'             => ['STF', 'KTA', 'KEP', 'ADM'],
         'process_update_password'   => ['STF', 'KTA', 'KEP', 'ADM'],
         'user_reset_password'       => ['ADM'],
@@ -87,7 +98,16 @@ function route($conn) {
         'dayoff'                    => ['ADM'],
         'dayoff_create'             => ['ADM'],
         'dayoff_edit'               => ['ADM'],
-        'dayoff_delete'             => ['ADM']
+        'dayoff_delete'             => ['ADM'],
+        'user_import_excel'         => ['ADM'],
+        'index_jabatan'             => ['ADM'],
+        'add_jabatan'               => ['ADM'],
+        'edit_jabatan'              => ['ADM'],
+        'delete_jabatan'            => ['ADM'],
+        'index_divisi'              => ['ADM'],
+        'add_divisi'                => ['ADM'],
+        'edit_divisi'               => ['ADM'],
+        'delete_divisi'             => ['ADM']
     ];
 
     // Jika halaman memiliki batasan role, periksa apakah pengguna memiliki izin
@@ -194,12 +214,23 @@ function route($conn) {
             $controller->laporanPerizinan();
             break;
 
+        case 'laporan_non_perizinan':
+            require_once __DIR__ . '/app/controllers/LaporanController.php';
+            $controller = new LaporanController($conn);
+            $controller->laporanNonPerizinan();
+            break;
+
         case 'export_laporan_excel':
             require_once __DIR__ . '/app/controllers/LaporanController.php';
             $controller = new LaporanController($conn);
             $controller->exportLaporanPerizinanExcel();
             break;
 
+        case 'export_laporan_non_perizinan_excel':
+            require_once __DIR__ . '/app/controllers/LaporanController.php';
+            $controller = new LaporanController($conn);
+            $controller->exportLaporanNonPerizinanExcel();
+            break;
 
         case 'verifikasi':
             require_once __DIR__ . '/app/controllers/LogController.php';
@@ -439,6 +470,78 @@ function route($conn) {
             $controller->delete();
             break;
 
+        case 'user_import_excel':
+            require_once __DIR__ . '/app/controllers/UserController.php';
+            $controller = new UserController($conn);
+            $controller->import_user_excel();
+            break;
+
+        case 'index_jabatan':
+            require_once __DIR__ . '/app/controllers/JabatanController.php';
+            $controller = new JabatanController($conn);
+            $controller->index();
+            break;
+
+        case 'add_jabatan':
+            require_once __DIR__ . '/app/controllers/JabatanController.php';
+            $controller = new JabatanController($conn);
+            $controller->create();
+            break;
+
+        case 'edit_jabatan':
+            require_once __DIR__ . '/app/controllers/JabatanController.php';
+            $controller = new JabatanController($conn);
+            $controller->edit();
+            break;
+
+        case 'delete_jabatan':
+            require_once __DIR__ . '/app/controllers/JabatanController.php';
+            $controller = new JabatanController($conn);
+            $controller->delete();
+            break;
+
+        case 'index_divisi':
+            require_once __DIR__ . '/app/controllers/DivisiController.php';
+            $controller = new DivisiController($conn);
+            $controller->index();
+            break;
+
+        case 'add_divisi':
+            require_once __DIR__ . '/app/controllers/DivisiController.php';
+            $controller = new DivisiController($conn);
+            $controller->create();
+            break;
+
+        case 'edit_divisi':
+            require_once __DIR__ . '/app/controllers/DivisiController.php';
+            $controller = new DivisiController($conn);
+            $controller->edit();
+            break;
+
+        case 'delete_divisi':
+            require_once __DIR__ . '/app/controllers/DivisiController.php';
+            $controller = new DivisiController($conn);
+            $controller->delete();
+            break;
+
+        case 'download_format_excel':
+            $file = __DIR__ . '/assets/templates/template_import_pegawai.xls';
+            if (file_exists($file)) {
+                header('Content-Description: File Transfer');
+                header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+                header('Content-Disposition: attachment; filename="template_import_pegawai.xlsx"');
+                header('Expires: 0');
+                header('Cache-Control: must-revalidate');
+                header('Pragma: public');
+                header('Content-Length: ' . filesize($file));
+                readfile($file);
+                exit;
+            } else {
+                $_SESSION['error'] = 'File template tidak ditemukan.';
+                header('Location: index.php?page=user_add');
+                exit;
+            }
+            break;
 
         default:
             echo "Halaman tidak ditemukan!";

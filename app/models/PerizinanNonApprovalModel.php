@@ -85,4 +85,114 @@ class PerizinanNonApprovalModel {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function getLaporanNonPerizinan($user_id, $month, $pemohon, $limit, $offset) {
+    // Dasar query
+        $query = "SELECT 
+                        u.nama, 
+                        l.*,
+                        CASE 
+                            WHEN SUM(TIMESTAMPDIFF(MINUTE, l.tanggal_keluar, l.tanggal_masuk)) < 60 
+                                THEN CONCAT(SUM(TIMESTAMPDIFF(MINUTE, l.tanggal_keluar, l.tanggal_masuk)), ' menit')
+                            ELSE CONCAT(
+                                FLOOR(SUM(TIMESTAMPDIFF(MINUTE, l.tanggal_keluar, l.tanggal_masuk)) / 60), ' jam ',
+                                MOD(SUM(TIMESTAMPDIFF(MINUTE, l.tanggal_keluar, l.tanggal_masuk)), 60), ' menit'
+                            )
+                        END AS total_waktu_keluar 
+                    FROM log_keluar_masuk_non_perizinan l
+                    INNER JOIN users u ON l.user_id = u.id
+                    WHERE l.user_id <> $user_id
+                        AND DATE_FORMAT(l.created_at, '%Y-%m') = :month";
+
+        $params = [ ':month' => $month ];
+
+        // Tambahkan filter nama pemohon jika diberikan
+        if (!empty($pemohon)) {
+            $query .= " AND u.nama LIKE :pemohon";
+            $params[':pemohon'] = "%" . $pemohon . "%";
+        }
+
+        // Tambahkan GROUP BY karena ada agregasi
+        $query .= " GROUP BY l.id";
+
+        // Pagination
+        $query .= " ORDER BY l.created_at DESC LIMIT :limit OFFSET :offset";
+
+        $stmt = $this->conn->prepare($query);
+
+        // Bind parameter dinamis
+        foreach ($params as $key => $value) {
+            $paramType = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
+            $stmt->bindValue($key, $value, $paramType);
+        }
+
+        // Bind limit dan offset
+        $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
+
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+            
+    // Metode untuk menghitung total data
+    public function countTotalLaporan($user_id, $month, $pemohon) {
+        $query = "SELECT 
+                    COUNT(*) 
+                FROM log_keluar_masuk_non_perizinan l
+                INNER JOIN users u ON l.user_id = u.id
+                WHERE l.user_id <> $user_id
+                    AND DATE_FORMAT(l.created_at, '%Y-%m') = :month";
+        
+        $params = [
+            ':month' => $month
+        ];
+        
+        if (!empty($pemohon)) {
+            $query .= " AND u.nama LIKE :pemohon";
+            $params[':pemohon'] = "%" . $pemohon . "%";
+        }
+        
+        $stmt = $this->conn->prepare($query);
+        
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value, is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR);
+        }
+        
+        $stmt->execute();
+        return $stmt->fetchColumn();
+    }
+
+    public function getLaporanNonPerizinanAll($user_id, $month, $pemohon) {
+        $query = "SELECT 
+                    u.nama, 
+                    l.*,
+                    CASE 
+                        WHEN SUM(TIMESTAMPDIFF(MINUTE, l.tanggal_keluar, l.tanggal_masuk)) < 60 
+                            THEN CONCAT(SUM(TIMESTAMPDIFF(MINUTE, l.tanggal_keluar, l.tanggal_masuk)), ' menit')
+                        ELSE CONCAT(
+                            FLOOR(SUM(TIMESTAMPDIFF(MINUTE, l.tanggal_keluar, l.tanggal_masuk)) / 60), ' jam ',
+                            MOD(SUM(TIMESTAMPDIFF(MINUTE, l.tanggal_keluar, l.tanggal_masuk)), 60), ' menit'
+                        )
+                    END AS total_waktu_keluar 
+                FROM log_keluar_masuk_non_perizinan l
+                INNER JOIN users u ON l.user_id = u.id
+                WHERE l.user_id <> $user_id
+                    AND DATE_FORMAT(l.created_at, '%Y-%m') = :month";
+
+        $params = [':month' => $month];
+
+        if (!empty($pemohon)) {
+            $query .= " AND u.nama LIKE :pemohon";
+            $params[':pemohon'] = "%" . $pemohon . "%";
+        }
+
+        $query .= " GROUP BY l.id ORDER BY l.created_at DESC";
+
+        $stmt = $this->conn->prepare($query);
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value, is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR);
+        }
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

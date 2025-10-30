@@ -77,11 +77,6 @@ class Sample
     {
         // Populate samples
         $baseDir = realpath(__DIR__ . '/../../../samples');
-        if ($baseDir === false) {
-            // @codeCoverageIgnoreStart
-            throw new RuntimeException('realpath returned false');
-            // @codeCoverageIgnoreEnd
-        }
         $directory = new RecursiveDirectoryIterator($baseDir);
         $iterator = new RecursiveIteratorIterator($directory);
         $regex = new RegexIterator($iterator, '/^.+\.php$/', RecursiveRegexIterator::GET_MATCH);
@@ -89,11 +84,6 @@ class Sample
         $files = [];
         foreach ($regex as $file) {
             $file = str_replace(str_replace('\\', '/', $baseDir) . '/', '', str_replace('\\', '/', $file[0]));
-            if (is_array($file)) {
-                // @codeCoverageIgnoreStart
-                throw new RuntimeException('str_replace returned array');
-                // @codeCoverageIgnoreEnd
-            }
             $info = pathinfo($file);
             $category = str_replace('_', ' ', $info['dirname'] ?? '');
             $name = str_replace('_', ' ', (string) preg_replace('/(|\.php)/', '', $info['filename']));
@@ -131,7 +121,7 @@ class Sample
             $writer = IOFactory::createWriter($spreadsheet, $writerType);
             $callStartTime = microtime(true);
             $writer->save($path);
-            $this->logWrite($writer, $path, /** @scrutinizer ignore-type */ $callStartTime);
+            $this->logWrite($writer, $path, $callStartTime);
         }
 
         $this->logEndingNotes();
@@ -169,7 +159,7 @@ class Sample
     {
         $originalExtension = pathinfo($filename, PATHINFO_EXTENSION);
 
-        return $this->getTemporaryFolder() . '/' . str_replace('.' . /** @scrutinizer ignore-type */ $originalExtension, '.' . $extension, basename($filename));
+        return $this->getTemporaryFolder() . '/' . str_replace('.' . $originalExtension, '.' . $extension, basename($filename));
     }
 
     /**
@@ -182,17 +172,12 @@ class Sample
     public function getTemporaryFilename($extension = 'xlsx')
     {
         $temporaryFilename = tempnam($this->getTemporaryFolder(), 'phpspreadsheet-');
-        if ($temporaryFilename === false) {
-            // @codeCoverageIgnoreStart
-            throw new RuntimeException('tempnam returned false');
-            // @codeCoverageIgnoreEnd
-        }
         unlink($temporaryFilename);
 
         return $temporaryFilename . '.' . $extension;
     }
 
-    public function log(string $message): void
+    public function log($message): void
     {
         $eol = $this->isCli() ? PHP_EOL : '<br />';
         echo date('H:i:s ') . $message . $eol;

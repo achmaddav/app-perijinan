@@ -60,11 +60,16 @@
                                     <div class="row mb-3 align-items-center">
                                         <label for="atasan" class="col-md-4 col-form-label">Atasan</label>
                                         <div class="col-md-8">
+                                            <?php
+                                                $nama_atasan = isset($atasan['nama']) ? $atasan['nama'] : '-';
+                                                $id_atasan = isset($atasan['id']) ? $atasan['id'] : 0;
+                                            ?>
                                             <input type="text" class="form-control shadow-sm" id="nama_atasan"
-                                                value="<?= htmlspecialchars($atasan['nama']); ?>" disabled>
-                                            <input type="hidden" name="atasan" id="atasan" value="<?= htmlspecialchars($atasan['id']); ?>">
+                                                value="<?= htmlspecialchars($nama_atasan); ?>" disabled>
+                                            <input type="hidden" name="atasan" id="atasan" value="<?= htmlspecialchars($id_atasan); ?>">
                                         </div>
                                     </div>
+
 
                                     <div class="row mb-3">
                                         <label for="tanggal_keluar" class="col-md-4 col-form-label">Tanggal & Waktu Keluar</label>

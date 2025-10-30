@@ -42,7 +42,6 @@ class Xml extends BaseReader
         $this->securityScanner = XmlScanner::getInstance($this);
     }
 
-    /** @var string */
     private $fileContents = '';
 
     public static function xmlMappings(): array
@@ -74,7 +73,7 @@ class Xml extends BaseReader
         ];
 
         // Open file
-        $data = file_get_contents($filename) ?: '';
+        $data = file_get_contents($filename);
 
         // Why?
         //$data = str_replace("'", '"', $data); // fix headers with single quote
@@ -113,7 +112,7 @@ class Xml extends BaseReader
     {
         try {
             $xml = simplexml_load_string(
-                $this->getSecurityScannerOrThrow()->scan($this->fileContents ?: file_get_contents($filename)),
+                $this->securityScanner->scan($this->fileContents ?: file_get_contents($filename)),
                 'SimpleXMLElement',
                 Settings::getLibXmlLoaderOptions()
             );
@@ -279,7 +278,7 @@ class Xml extends BaseReader
 
             if (
                 isset($this->loadSheetsOnly, $worksheet_ss['Name']) &&
-                (!in_array($worksheet_ss['Name'], /** @scrutinizer ignore-type */ $this->loadSheetsOnly))
+                (!in_array($worksheet_ss['Name'], $this->loadSheetsOnly))
             ) {
                 continue;
             }

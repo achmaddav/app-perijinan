@@ -7,6 +7,13 @@
     <!-- Content Wrapper -->
     <div class="content-wrapper">
         <div class="content-header">
+            <?php if (isset($_SESSION['success'])): ?>
+                <div class="alert alert-success alert-dismissible fade show shadow-sm auto-dismiss" role="alert">
+                    <i class="fas fa-check-circle me-2"></i> <?= $_SESSION['success']; ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <?php unset($_SESSION['success']); ?>
+            <?php endif; ?>
             <div class="container-fluid">
                 <div class="row mb-4">
                     <div class="col-sm-12 text-center">

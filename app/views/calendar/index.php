@@ -46,9 +46,9 @@
                                                 <td><?= htmlspecialchars($row['tanggal']); ?></td>
                                                 <td>
                                                     <?php if ($row['is_weekend']): ?>
-                                                        <span class="badge bg-warning text-dark">Ya</span>
+                                                        <span class="badge bg-secondary text-dark">Tidak</span>
                                                     <?php else: ?>
-                                                        <span class="badge bg-secondary">Tidak</span>
+                                                        <span class="badge bg-warning">Ya</span>
                                                     <?php endif; ?>
                                                 </td>
                                                 <td>

@@ -49,11 +49,16 @@
                                                 <td><?= htmlspecialchars($izin['alasan']); ?></td>
                                                 <td>
                                                     <?php
-                                                        $statusClass = match ($izin['status']) {
-                                                            'Approved' => 'badge bg-success',
-                                                            'Rejected' => 'badge bg-danger',
-                                                            default => 'badge bg-warning text-dark',
-                                                        };
+                                                        // Ganti match dengan switch agar support PHP lama
+                                                        $statusClass = 'badge bg-warning text-dark'; // default
+                                                        switch ($izin['status']) {
+                                                            case 'Approved':
+                                                                $statusClass = 'badge bg-success';
+                                                                break;
+                                                            case 'Rejected':
+                                                                $statusClass = 'badge bg-danger';
+                                                                break;
+                                                        }
                                                     ?>
                                                     <span class="<?= $statusClass; ?>"><?= htmlspecialchars($izin['status']); ?></span>
                                                 </td>

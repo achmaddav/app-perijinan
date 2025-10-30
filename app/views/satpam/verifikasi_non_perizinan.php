@@ -101,7 +101,9 @@ include __DIR__ . '/../layouts/header.php';
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="user_id" class="form-label">Pilih Karyawan</label>
-                        <select name="user_id" id="userDropdown" class="form-select" required>
+                        <select name="user_id" id="userDropdown"
+                            class="form-select select2"
+                            required style="width: 100%;">
                             <option value="" selected disabled>-- Pilih Karyawan --</option>
                             <?php foreach ($userList as $user): ?>
                                 <option value="<?= htmlspecialchars($user['id']); ?>">
@@ -197,6 +199,37 @@ include __DIR__ . '/../layouts/header.php';
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
+
+    /* Supaya kotak Select2 sama dengan form-control bootstrap */
+    .select2-container .select2-selection--single {
+        height: 38px;
+        /* sama dengan .form-select bootstrap */
+        padding: 4px 12px;
+        display: flex;
+        align-items: center;
+        /* teks di tengah */
+        border: 1px solid #ced4da;
+        border-radius: 0.375rem;
+    }
+
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: normal !important;
+        padding-left: 0;
+        color: #6c757d;
+        /* warna abu placeholder */
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: calc(2.25rem + 2px);
+        right: 10px;
+    }
+
+    .select2-container {
+        width: 100% !important;
+    }
 </style>
 
+
 <?php include __DIR__ . '/../layouts/footer.php'; ?>
+<script src="/app-perijinan/assets/js/perizinan/perizinan.js?v=<?= time(); ?>"></script>

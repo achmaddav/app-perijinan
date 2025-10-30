@@ -144,18 +144,39 @@ class CutiController
         $dompdf->stream("Formulir_Cuti_{$cuti['id']}.pdf", ["Attachment" => true]);
     }
 
+    private function formatTanggalIndonesia($tanggal)
+    {
+        $bulan = [
+            1 => 'Januari', 2 => 'Februari', 3 => 'Maret',
+            4 => 'April', 5 => 'Mei', 6 => 'Juni',
+            7 => 'Juli', 8 => 'Agustus', 9 => 'September',
+            10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+        ];
+
+        $tgl = date('d', strtotime($tanggal));
+        $bln = $bulan[(int)date('m', strtotime($tanggal))];
+        $thn = date('Y', strtotime($tanggal));
+
+        return "$tgl $bln $thn";
+    }
+
+
     private function renderCutiHtml($cuti)
     {
-        $formatter = new IntlDateFormatter(
-            'id_ID',
-            IntlDateFormatter::LONG,
-            IntlDateFormatter::NONE,
-            'Asia/Jakarta',
-            IntlDateFormatter::GREGORIAN,
-            'dd MMMM yyyy'
-        );
-        $tanggalMulaiFormatted = $formatter->format(new DateTime($cuti['tanggal_mulai']));
-        $tanggalPengajuan = $formatter->format(new DateTime($cuti['created_at']));
+        // $formatter = new IntlDateFormatter(
+        //     'id_ID',
+        //     IntlDateFormatter::LONG,
+        //     IntlDateFormatter::NONE,
+        //     'Asia/Jakarta',
+        //     IntlDateFormatter::GREGORIAN,
+        //     'dd MMMM yyyy'
+        // );
+        // $tanggalMulaiFormatted = $formatter->format(new DateTime($cuti['tanggal_mulai']));
+        // $tanggalPengajuan = $formatter->format(new DateTime($cuti['created_at']));
+
+        $tanggalMulaiFormatted = $this->formatTanggalIndonesia($cuti['tanggal_mulai']);
+        $tanggalPengajuan = $this->formatTanggalIndonesia($cuti['created_at']);
+
 
         // $logoPath = $_SERVER['DOCUMENT_ROOT'] . "/app-perijinan/assets/image/logo.png";
         // $logoPath = 'file://' . realpath($logoPath);
@@ -183,10 +204,8 @@ class CutiController
                 }
 
                 .header-container {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
                     position: relative;
+                    text-align: center;
                     padding: 10px 20px;
                 }
 
@@ -204,18 +223,9 @@ class CutiController
                     line-height: 1.4;
                 }
 
-                /* .header-text .ministry {
-                    font-weight: bold;
-                } */
-
-                .header {
-                    text-align: center;
-                    margin-bottom: 2px;
-                    padding-bottom: 5px;
-                }
-
                 .ministry {
                     font-size: 12px;
+                    font-weight: bold;
                 }
 
                 .directorate {
@@ -238,36 +248,21 @@ class CutiController
                 }
 
                 .center-container {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
+                    display: block; /* flex diganti block */
                     width: 100%;
+                    text-align: center;
                 }
-                
+
                 .regulation-box {
-                    margin-top: 1px;
+                    display: inline-block;
                     text-align: left;
-                    /* border: 1px solid #000;  */
-                    padding: 0px;
                     padding-left: 400px;
-                    width: fit-content;
                     max-width: 100%;
                 }
-
-                .note-box {
-                    margin-top: 1px;
+                .regulation-box-address{
+                    display: inline-block;
                     text-align: left;
-                    /* border: 1px solid #000;  */
-                    /* padding-left: 310px; */
-                    width: fit-content;
-                    max-width: 100%;
-                }
-
-                .regulation-box-address {
-                    text-align: left;
-                    padding: 0px;
                     padding-left: 520px;
-                    width: fit-content;
                     max-width: 100%;
                 }
 
@@ -281,24 +276,19 @@ class CutiController
                 table {
                     width: 100%;
                     border-collapse: collapse;
-                    margin-bottom: 15px;
+                    margin-bottom: 10px;
                 }
 
-                table,
-                th,
-                td {
+                table, th, td {
                     border: 1px solid black;
                 }
 
-                th,
-                td {
-                    padding: 8px;
+                th, td {
                     text-align: left;
                 }
 
                 .section-title {
                     font-weight: bold;
-                    /* background-color: #f2f2f2; */
                 }
 
                 .empty-row {
@@ -309,185 +299,220 @@ class CutiController
                     margin-top: 30px;
                     text-align: right;
                 }
+
             </style>
         </head>
 
         <body> 
-            <div class="header-container">
-                <img src="<?= $base64 ?>" class="logo" alt="Logo"> 
-                <div class="header-text">
-                    <div class="ministry">KEMENTERIAN PERTANIAN</div>
-                    <div class="directorate">DIREKTORAT JENDERAL PETERNAKAN DAN KESEHATAN HEWAN</div>
-                    <div class="office">BALAI PEMBIBITAN TERNAK UNGGUL DAN HIJAUAN PAKAN TERNAK SEMBAWA</div>
-                    <div class="contact">
-                        JALAN RAYA PALEMBANG-PANGKALAN BALAI KM.20 SEMBAWA KOTAK POS 1116 PALEMBANG 30001<br>
-                        TELEPON (0711) 7853010 &nbsp;&nbsp; e-Mail: bptuhptsembawa@yahoo.com &nbsp;&nbsp; Web: www.bptuhpt-sembawa
-                    </div>
-                </div>
-            </div>
-
-            <div style="border-bottom: 2px solid black; margin-bottom: 2px;"></div>
-            <div style="border-bottom: 1px solid black;"></div>
-
-            <div class="center-container" style="font-size: 10pt; padding: 0px; padding-left: 2px;">
-                <div class="regulation-box">
-                    ANAK LAMPIRAN 1.b<br>
-                    PERATURAN BADAN KEPEGAWAIAN NEGARA<br>
-                    REPUBLIK INDONESIA<br>
-                    NOMOR 24 TAHUN 2017<br>
-                    TENTANG<br>
-                    TATA CARA PEMBERIAN CUTI PEGAWAI NEGERI SIPIL
-                </div>
-                
-                <div class="regulation-box-address" style="margin-top: 5px;">
-                    Sembawa, <?= htmlspecialchars($tanggalPengajuan); ?><br>
-                    Kepada,<br>
-                    Yth. Kepala BPTU-HPT Sembawa<br>
-                    di Tempat
-                </div>
-            </div>
-
-            <div class="form-title" style="margin-top: 10px; margin-bottom: 10px; font-size: 10pt;">FORMULIR PERMINTAAN DAN PEMBERIAN CUTI</div>
-
-            <table border="1" style="border-collapse: collapse; width: 100%;">
-                <tr class="section-title">
-                    <td colspan="4" style="font-size: 10pt; padding: 0px; padding-left: 2px;"><strong>I. DATA PEGAWAI</strong></td>
-                </tr>
+            <!-- Header -->
+            <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse; border: none; margin-bottom: 0;">
                 <tr>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;">Nama</td>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;"><?= htmlspecialchars($cuti['nama_pemohon']); ?></td>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;">NIP</td>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;"><?= htmlspecialchars($cuti['nip']); ?></td>
-                </tr>
-                <tr>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;">Jabatan</td>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;"><?= htmlspecialchars($cuti['jabatan']); ?></td>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;">Masa Kerja</td>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;"><?= htmlspecialchars($cuti['tahun_masa_kerja']); ?> tahun <?= htmlspecialchars($cuti['bulan_masa_kerja']); ?> bulan</td>
-                </tr>
-                <tr>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;">Unit Kerja</td>
-                    <td colspan="3" style="font-size: 8pt; padding: 0px; padding-left: 2px;">BPTU-HPT Sembawa</td>
-                </tr>
-            </table>
-
-            <table>
-                <tr class="section-title">
-                    <td colspan="4" style="font-size: 10pt; padding: 0px; padding-left: 2px;">II. JENIS CUTI YANG DIAMBIL**</td>
-                </tr>
-                <tr>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;">1. Cuti Tahunan</td>
-                    <td style="text-align: center; font-size: 10pt; padding: 2px;">
-                        <?= $cuti['kode_cuti'] === 'CT' ? 'v' : '-'; ?>
+                    <!-- Logo -->
+                    <td style="width: 100px; vertical-align: top; text-align: right; padding-left: 10px; padding-bottom: 5px; border: none;">
+                        <img src="<?= $base64 ?>" style="width: 80px; height: auto; display: block;" alt="Logo">
                     </td>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;">2. Cuti Besar</td>
-                    <td style="text-align: center; font-size: 10pt; padding: 2px;">
-                        <?= $cuti['kode_cuti'] === 'CB' ? 'v' : '-'; ?>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;">3. Cuti Sakit</td>
-                    <td style="text-align: center; font-size: 10pt; padding: 2px;">
-                        <?= $cuti['kode_cuti'] === 'CS' ? 'v' : '-'; ?>
-                    </td>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;">4. Cuti Melahirkan</td>
-                    <td style="text-align: center; font-size: 10pt; padding: 2px;">
-                        <?= $cuti['kode_cuti'] === 'CM' ? 'v' : '-'; ?>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;">5. Cuti Karena Alasan Penting</td>
-                    <td style="text-align: center; font-size: 10pt; padding: 2px;">
-                        <?= $cuti['kode_cuti'] === 'CKAP' ? 'v' : '-'; ?>
-                    </td>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;">6. Cuti di Luar Tanggungan Negara</td>
-                    <td style="text-align: center; font-size: 10pt; padding: 2px;">
-                        <?= $cuti['kode_cuti'] === 'CLTN' ? 'v' : '-'; ?>
+
+                    <!-- Header Text -->
+                    <td style="text-align: center; color: #1F9CF0; font-size: 10pt; vertical-align: middle; padding: 0; border: none;">
+                        <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse; border: none;">
+                            <tr>
+                                <td style="font-size: 13px; line-height: 1.15; text-align: center; border: none;">
+                                    KEMENTERIAN PERTANIAN
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="font-size: 14px; line-height: 1.15; text-align: center; margin-bottom: 5px; border: none;">
+                                    DIREKTORAT JENDERAL PETERNAKAN DAN KESEHATAN HEWAN
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="font-size: 15px; line-height: 1.15; text-align: center; margin-bottom: 5px; border: none;">
+                                    BALAI PEMBIBITAN TERNAK UNGGUL DAN HIJAUAN PAKAN TERNAK SEMBAWA
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="font-size: 11px; line-height: 1.2; text-align: center; border: none;">
+                                    JALAN RAYA PALEMBANG-PANGKALAN BALAI KM.20 SEMBAWA KOTAK POS 1116 PALEMBANG 30001<br>
+                                    TELEPON (0711) 7853010 &nbsp;&nbsp; e-Mail: bptuhptsembawa@yahoo.com &nbsp;&nbsp; Web: www.bptuhpt-sembawa
+                                </td>
+                            </tr>
+                        </table>
                     </td>
                 </tr>
             </table>
 
-            <table>
-                <tr class="section-title">
-                    <td colspan="4" style="font-size: 10pt; padding: 0px; padding-left: 2px;">III. ALASAN CUTI</td>
-                </tr>
+            <!-- Garis bawah -->
+            <hr style="border: 0; border-top: 1.5px solid black; margin: 0 0 2px 0;">
+            <hr style="border: 0; border-top: 0.3px solid black; margin: 0 0 4px 0;">
+
+
+            <!-- Regulation -->
+            <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse; margin: 0; padding: 0; font-size: 10pt; border: none;">
                 <tr>
-                    <td colspan="4" style="font-size: 8pt; padding: 0px; padding-left: 2px;"><?= htmlspecialchars($cuti['alasan']); ?></td>
+                    <td style="text-align: left; vertical-align: top; border: none; padding-left: 400px;">
+                        ANAK LAMPIRAN 1.b<br>
+                        PERATURAN BADAN KEPEGAWAIAN NEGARA<br>
+                        REPUBLIK INDONESIA<br>
+                        NOMOR 24 TAHUN 2017<br>
+                        TENTANG<br>
+                        TATA CARA PEMBERIAN CUTI PEGAWAI NEGERI SIPIL
+                    </td>
                 </tr>
             </table>
 
-            <table>
-                <tr class="section-title">
-                    <td colspan="4" style="font-size: 10pt; padding: 0px; padding-left: 2px;">IV. LAMANYA CUTI</td>
-                </tr>
+            <!-- Address -->
+            <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse; margin: 0; padding: 0; font-size: 10pt; border: none;">
                 <tr>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;">Selama</td>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;"><?= htmlspecialchars($cuti['lama_cuti']); ?> hari</td>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;">Mulai Tanggal</td>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;"><?= $tanggalMulaiFormatted; ?></td>
+                    <td style="text-align: left; vertical-align: top; border: none; padding-left: 520px;">
+                        Sembawa, <?= htmlspecialchars($tanggalPengajuan); ?><br>
+                        Kepada,<br>
+                        Yth. Kepala BPTU-HPT Sembawa<br>
+                        di Tempat
+                    </td>
                 </tr>
             </table>
 
-            <table>
-                <tr class="section-title">
-                    <td colspan="5" style="font-size: 10pt; padding: 0px; padding-left: 2px;">V. CATATAN CUTI***</td>
-                </tr>
+            <!-- Form Title -->
+            <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse; margin: 8px 0; border: none;">
                 <tr>
-                    <td colspan="3" style="font-size: 8pt; padding: 0px; padding-left: 2px;">1. CUTI TAHUNAN</td>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;">2. CUTI BESAR</td>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;"><?= htmlspecialchars($cuti['cuti_besar']); ?> hari</td>
-                </tr>
-                <tr>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;">Tahun</td>
-                    <td style="text-align: center; font-size: 8pt; padding: 0px; padding-left: 2px;">Sisa</td>
-                    <td style="text-align: center; font-size: 8pt; padding: 0px; padding-left: 2px;">Keterangan</td>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;">3. CUTI SAKIT</td>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;"><?= htmlspecialchars($cuti['cuti_sakit']); ?> hari</td>
-                </tr>
-                <tr>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;">N-<?= date('Y') - 2 ?></td>
-                    <td style="text-align: center; font-size: 8pt; padding: 0px; padding-left: 2px;"><?= htmlspecialchars($cuti['sisa_cuti_n_2']); ?> hari</td>
-                    <td style="text-align: center; font-size: 8pt; padding: 0px; padding-left: 2px;"></td>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;">4. CUTI MELAHIRKAN</td>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;"><?= htmlspecialchars($cuti['cuti_melahirkan']); ?> hari</td>
-                </tr>
-                <tr>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;">N-<?= date('Y') - 1 ?></td>
-                    <td style="text-align: center; font-size: 8pt; padding: 0px; padding-left: 2px;"><?= htmlspecialchars($cuti['sisa_cuti_n_1']); ?> hari</td>
-                    <td style="text-align: center; font-size: 8pt; padding: 0px; padding-left: 2px;"></td>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;">5. CUTI KARENA ALASAN PENTING</td>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;"><?= htmlspecialchars($cuti['cuti_alasan_penting']); ?> hari</td>
-                </tr>
-                <tr>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;">N-<?= date('Y') ?></td>
-                    <td style="text-align: center; font-size: 8pt; padding: 0px; padding-left: 2px;"><?= htmlspecialchars($cuti['sisa_cuti_n_0']); ?> hari</td>
-                    <td style="text-align: center; font-size: 8pt; padding: 0px; padding-left: 2px;"></td>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;">6. CUTI DILIUAR TANGGUNGAN NEGARA</td>
-                    <td style="font-size: 8pt; padding: 0px; padding-left: 2px;"><?= htmlspecialchars($cuti['cuti_diluar_tanggungan_negara']); ?> hari</td>
+                    <td style="text-align: center; font-weight: bold; font-size: 10pt; padding: 2px; border: none;">
+                        FORMULIR PERMINTAAN DAN PEMBERIAN CUTI
+                    </td>
                 </tr>
             </table>
+
+            <!-- Data Pegawai -->
+            <table border="1" style="border-collapse: collapse; width: 100%; font-size: 8pt; margin-top: 0;">
+                <tr>
+                    <td colspan="4" style="font-size: 10pt; padding: 2px;"><strong>I. DATA PEGAWAI</strong></td>
+                </tr>
+                <tr>
+                    <td style="padding: 2px;">Nama</td>
+                    <td style="padding: 2px;"><?= htmlspecialchars($cuti['nama_pemohon']); ?></td>
+                    <td style="padding: 2px;">NIP</td>
+                    <td style="padding: 2px;"><?= htmlspecialchars($cuti['nip']); ?></td>
+                </tr>
+                <tr>
+                    <td style="padding: 2px;">Jabatan</td>
+                    <td style="padding: 2px;"><?= htmlspecialchars($cuti['jabatan']); ?></td>
+                    <td style="padding: 2px;">Masa Kerja</td>
+                    <td style="padding: 2px;"><?= htmlspecialchars($cuti['tahun_masa_kerja']); ?> tahun <?= htmlspecialchars($cuti['bulan_masa_kerja']); ?> bulan</td>
+                </tr>
+                <tr>
+                    <td style="padding: 2px;">Unit Kerja</td>
+                    <td colspan="3" style="padding: 2px;">BPTU-HPT Sembawa</td>
+                </tr>
+            </table>
+
+            <table border="1" style="border-collapse: collapse; width: 100%; font-size: 8pt; margin-top: 5px;">
+                <tr>
+                    <td colspan="4" style="font-size: 10pt; padding: 2px;"><strong>II. JENIS CUTI YANG DIAMBIL**</strong></td>
+                </tr>
+                <tr>
+                    <td style="padding: 2px;">1. Cuti Tahunan</td>
+                    <td style="text-align: center; padding: 2px;"><?= $cuti['kode_cuti'] === 'CT' ? 'v' : '-'; ?></td>
+                    <td style="padding: 2px;">2. Cuti Besar</td>
+                    <td style="text-align: center; padding: 2px;"><?= $cuti['kode_cuti'] === 'CB' ? 'v' : '-'; ?></td>
+                </tr>
+                <tr>
+                    <td style="padding: 2px;">3. Cuti Sakit</td>
+                    <td style="text-align: center; padding: 2px;"><?= $cuti['kode_cuti'] === 'CS' ? 'v' : '-'; ?></td>
+                    <td style="padding: 2px;">4. Cuti Melahirkan</td>
+                    <td style="text-align: center; padding: 2px;"><?= $cuti['kode_cuti'] === 'CM' ? 'v' : '-'; ?></td>
+                </tr>
+                <tr>
+                    <td style="padding: 2px;">5. Cuti Karena Alasan Penting</td>
+                    <td style="text-align: center; padding: 2px;"><?= $cuti['kode_cuti'] === 'CKAP' ? 'v' : '-'; ?></td>
+                    <td style="padding: 2px;">6. Cuti di Luar Tanggungan Negara</td>
+                    <td style="text-align: center; padding: 2px;"><?= $cuti['kode_cuti'] === 'CLTN' ? 'v' : '-'; ?></td>
+                </tr>
+            </table>
+
+
+            <table border="1" style="border-collapse: collapse; width: 100%; font-size: 8pt; margin-top: 5px;">
+                <tr>
+                    <td colspan="4" style="font-size: 10pt; padding: 2px;"><strong>III. ALASAN CUTI</strong></td>
+                </tr>
+                <tr>
+                    <td colspan="4" style="padding: 2px;"><?= htmlspecialchars($cuti['alasan']); ?></td>
+                </tr>
+            </table>
+
+            <table border="1" style="border-collapse: collapse; width: 100%; font-size: 8pt; margin-top: 5px;">
+                <tr>
+                    <td colspan="4" style="font-size: 10pt; padding: 2px;"><strong>IV. LAMANYA CUTI</strong></td>
+                </tr>
+                <tr>
+                    <td style="padding: 2px;">Selama</td>
+                    <td style="padding: 2px;"><?= htmlspecialchars($cuti['lama_cuti']); ?> hari</td>
+                    <td style="padding: 2px;">Mulai Tanggal</td>
+                    <td style="padding: 2px;"><?= $tanggalMulaiFormatted; ?></td>
+                </tr>
+            </table>
+
+
+            <table border="1" style="border-collapse: collapse; width: 100%; font-size: 8pt; margin-top: 5px;">
+                <tr>
+                    <td colspan="5" style="font-size: 10pt; padding: 2px;"><strong>V. CATATAN CUTI***</strong></td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="padding: 2px;">1. CUTI TAHUNAN</td>
+                    <td style="padding: 2px;">2. CUTI BESAR</td>
+                    <td style="padding: 2px;"><?= htmlspecialchars($cuti['cuti_besar']); ?> hari</td>
+                </tr>
+                <tr>
+                    <td style="padding: 2px;">Tahun</td>
+                    <td style="text-align: center; padding: 2px;">Sisa</td>
+                    <td style="text-align: center; padding: 2px;">Keterangan</td>
+                    <td style="padding: 2px;">3. CUTI SAKIT</td>
+                    <td style="padding: 2px;"><?= htmlspecialchars($cuti['cuti_sakit']); ?> hari</td>
+                </tr>
+                <tr>
+                    <td style="padding: 2px;">N-<?= date('Y') - 2 ?></td>
+                    <td style="text-align: center; padding: 2px;"><?= htmlspecialchars($cuti['sisa_cuti_n_2']); ?> hari</td>
+                    <td style="text-align: center; padding: 2px;"></td>
+                    <td style="padding: 2px;">4. CUTI MELAHIRKAN</td>
+                    <td style="padding: 2px;"><?= htmlspecialchars($cuti['cuti_melahirkan']); ?> hari</td>
+                </tr>
+                <tr>
+                    <td style="padding: 2px;">N-<?= date('Y') - 1 ?></td>
+                    <td style="text-align: center; padding: 2px;"><?= htmlspecialchars($cuti['sisa_cuti_n_1']); ?> hari</td>
+                    <td style="text-align: center; padding: 2px;"></td>
+                    <td style="padding: 2px;">5. CUTI KARENA ALASAN PENTING</td>
+                    <td style="padding: 2px;"><?= htmlspecialchars($cuti['cuti_alasan_penting']); ?> hari</td>
+                </tr>
+                <tr>
+                    <td style="padding: 2px;">N-<?= date('Y') ?></td>
+                    <td style="text-align: center; padding: 2px;"><?= htmlspecialchars($cuti['sisa_cuti_n_0']); ?> hari</td>
+                    <td style="text-align: center; padding: 2px;"></td>
+                    <td style="padding: 2px;">6. CUTI DI LUAR TANGGUNGAN NEGARA</td>
+                    <td style="padding: 2px;"><?= htmlspecialchars($cuti['cuti_diluar_tanggungan_negara']); ?> hari</td>
+                </tr>
+            </table>
+
 
             <table style="width: 100%; border-collapse: collapse;" border="1">
                 <tr>
-                    <td colspan="4" style="font-size: 10pt; padding: 0px; padding-left: 2px;"><strong>VI. ALAMAT SELAMA MENJALANKAN CUTI</strong></td>
+                    <td colspan="4" style="font-size: 10pt; padding: 2px;"><strong>VI. ALAMAT SELAMA MENJALANKAN CUTI</strong></td>
                 </tr>
                 <tr style="height: 100px;">
                     <!-- Alamat panjang -->
-                    <td rowspan="2" colspan="2" style="text-align: center; vertical-align: middle; width: 50%; font-size: 8pt; padding: 0px; padding-left: 2px;">
+                    <td rowspan="2" colspan="2" style="text-align: left; vertical-align: top; width: 50%; font-size: 8pt; padding: 2px;">
                         <?= htmlspecialchars($cuti['alamat']); ?>
                     </td>
 
                     <!-- TELP -->
-                    <td style="width: 10%; vertical-align: top; font-size: 8pt; padding: 0px; padding-left: 2px;">TELP</td>
-                    <td style="width: 40%; vertical-align: top; font-size: 8pt; padding: 0px; padding-left: 2px;"><?= htmlspecialchars($cuti['phone_number']); ?></td>
+                    <td style="width: 10%; vertical-align: top; font-size: 8pt; padding: 2px;">TELP</td>
+                    <td style="width: 40%; vertical-align: top; font-size: 8pt; padding: 2px;"><?= htmlspecialchars($cuti['phone_number']); ?></td>
                 </tr>
                 <tr>
-                    <td colspan="2" style="text-align: center; vertical-align: top; font-size: 8pt; padding: 0px; padding-left: 2px;">
+                    <td colspan="2" style="text-align: center; vertical-align: top; font-size: 8pt; padding: 2px;">
                         Hormat saya,<br><br><br><br><br>
                         NIP. <?= htmlspecialchars($cuti['nip']); ?>
                     </td>
                 </tr>
             </table>
+
 
             <table style="width: 100%; border-collapse: collapse;" border="1">
                 <!-- Header Pertimbangan -->
@@ -517,25 +542,25 @@ class CutiController
 
                 <!-- Area tanda tangan -->
                 <tr style="height: 100px;">
-                    <!-- Kolom kiri kosong, tanpa border kiri dan bawah -->
-                    <td rowspan="2" colspan="3" 
-                        style="vertical-align: top; font-size: 8pt; padding: 0px 0px 0px 2px; border-left: none; border-bottom: none;">
-                    </td>
-
-                    <!-- Kolom tanda tangan -->
-                    <td style="text-align: center; vertical-align: top; font-size: 8pt; padding: 0px;">
-                        <div style="padding-top: 60px;">
-                            ( Dr. Muhammad Imron, S.Pt .M.Si )<br>
-                            NIP. 197311301998031006
-                        </div>
+                    <td style="width: 75%;" colspan="3">&nbsp;</td>
+                    <td style="width: 25%; text-align: center; vertical-align: bottom; font-size: 8pt; padding: 2px; height: 100px;">
+                        <?php 
+                        $namaTtd = ($cuti['kode_jabatan'] !== 'KTA') ? $cuti['nama_ketua'] : $cuti['nama_kepala'];
+                        $nipTtd  = ($cuti['kode_jabatan'] !== 'KTA') ? $cuti['nip_ketua'] : $cuti['nip_kepala'];
+                        ?>
+                        ( <?= htmlspecialchars($namaTtd); ?> )<br>
+                        <?= htmlspecialchars($nipTtd); ?>
                     </td>
                 </tr>
             </table>
 
+
             <table style="width: 100%; border-collapse: collapse;" border="1">
-                <!-- Header Pertimbangan -->
+                <!-- Header Keputusan -->
                 <tr>
-                    <td colspan="4" style="font-size: 10pt; padding: 2px;"><strong>VIII. KEPUTUSAN PEJABAT YANG BERWENANG MEMBERIKAN CUTI**</strong></td>
+                    <td colspan="4" style="font-size: 10pt; padding: 2px;">
+                        <strong>VIII. KEPUTUSAN PEJABAT YANG BERWENANG MEMBERIKAN CUTI**</strong>
+                    </td>
                 </tr>
 
                 <!-- Opsi Disetujui dst -->
@@ -558,60 +583,54 @@ class CutiController
                     </td>
                 </tr>
 
-                <!-- Area tanda tangan -->
                 <tr style="height: 100px;">
-                    <!-- Kolom kiri kosong, tanpa border kiri dan bawah -->
-                    <td rowspan="2" colspan="3" 
-                        style="vertical-align: top; font-size: 8pt; padding: 0px 0px 0px 2px; border-left: none; border-bottom: none;">
-                    </td>
-
-                    <!-- Kolom tanda tangan -->
-                    <td style="text-align: center; vertical-align: top; font-size: 8pt; padding: 0px;">
-                        <div style="padding-top: 60px;">
-                            ( Dr. Muhammad Imron, S.Pt .M.Si )<br>
-                            NIP. 197311301998031006
-                        </div>
+                    <td style="width: 75%;" colspan="3">&nbsp;</td>
+                    <td style="width: 25%; text-align: center; vertical-align: bottom; font-size: 8pt; padding: 2px; height: 100px;">
+                        ( <?= htmlspecialchars($cuti['nama_kepala']); ?> )<br>
+                        <?= htmlspecialchars($cuti['nip_kepala']); ?>
                     </td>
                 </tr>
+
             </table>
+
             
-            <div style="font-size: 10pt; padding-left: 2px;">
+            <div style="font-size: 10pt; padding: 0 2px 0 2px; line-height: 1.1;">
                 Catatan :
-                <table style="border-collapse: collapse; font-size: 7pt; margin-top: 2px; border: none;">
+                <table style="border-collapse: collapse; font-size: 7pt; margin-bottom: 5px; border: none; width: 100%;">
                     <tr>
-                        <td style="width: 60px; vertical-align: top; border: none; padding: 0px; padding-left: 2px;">*</td>
-                        <td style="border: none; padding: 0px; padding-left: 2px;">Coret yang tidak perlu</td>
+                        <td style="width: 50px; vertical-align: top; border: none; padding: 0;">*</td>
+                        <td style="border: none; padding: 0;">Coret yang tidak perlu</td>
                     </tr>
                     <tr>
-                        <td style="vertical-align: top; border: none; padding: 0px; padding-left: 2px;">**</td>
-                        <td style="border: none; padding: 0px; padding-left: 2px;">Pilih salah satu dengan memberi tanda centang (V)</td>
+                        <td style="vertical-align: top; border: none; padding: 0;">**</td>
+                        <td style="border: none; padding: 0;">Pilih salah satu dengan memberi tanda centang (V)</td>
                     </tr>
                     <tr>
-                        <td style="vertical-align: top; border: none; padding: 0px; padding-left: 2px;">***</td>
-                        <td style="border: none; padding: 0px; padding-left: 2px;">Diisi oleh pejabat yang menangani bidang kepegawaian sebelum PNS mengajukan cuti</td>
+                        <td style="vertical-align: top; border: none; padding: 0;">***</td>
+                        <td style="border: none; padding: 0;">Diisi oleh pejabat yang menangani bidang kepegawaian sebelum PNS mengajukan cuti</td>
                     </tr>
                     <tr>
-                        <td style="vertical-align: top; border: none; padding: 0px; padding-left: 2px;">****</td>
-                        <td style="border: none; padding: 0px; padding-left: 2px;">Diberi tanda centang dan alasannya</td>
+                        <td style="vertical-align: top; border: none; padding: 0;">****</td>
+                        <td style="border: none; padding: 0;">Diberi tanda centang dan alasannya</td>
                     </tr>
                     <tr>
-                        <td style="vertical-align: top; border: none; padding: 0px; padding-left: 2px;">N</td>
-                        <td style="border: none; padding: 0px; padding-left: 2px;">Cuti Tahun berjalan</td>
+                        <td style="vertical-align: top; border: none; padding: 0;">N</td>
+                        <td style="border: none; padding: 0;">Cuti Tahun berjalan</td>
                     </tr>
                     <tr>
-                        <td style="vertical-align: top; border: none; padding: 0px; padding-left: 2px;">N-1</td>
-                        <td style="border: none; padding: 0px; padding-left: 2px;">Sisa cuti 1 tahun sebelumnya</td>
+                        <td style="vertical-align: top; border: none; padding: 0;">N-1</td>
+                        <td style="border: none; padding: 0;">Sisa cuti 1 tahun sebelumnya</td>
                     </tr>
                     <tr>
-                        <td style="vertical-align: top; border: none; padding: 0px; padding-left: 2px;">N-2</td>
-                        <td style="border: none; padding: 0px; padding-left: 2px;">Sisa cuti 2 tahun sebelumnya</td>
+                        <td style="vertical-align: top; border: none; padding: 0;">N-2</td>
+                        <td style="border: none; padding: 0;">Sisa cuti 2 tahun sebelumnya</td>
                     </tr>
                 </table>
-            </div>
-                
-            <div style="border-bottom: 1px solid black; margin-top: 2px; margin-bottom: 2px;"></div>
-            <div style="border-bottom: 2px solid black;"></div>
-            </div>
+
+                <!-- Garis bawah -->
+                <hr style="border: 0; border-top: 0.3px solid black; margin: 0 0 2px 0;">
+                <hr style="border: 0; border-top: 1.5px solid black; margin: 0 0 4px 0;">
+            </div>          
             
         </body>
 

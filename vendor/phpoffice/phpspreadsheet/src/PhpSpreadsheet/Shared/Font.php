@@ -201,23 +201,6 @@ class Font
     ];
 
     /**
-     * Array that can be used to supplement FONT_FILE_NAMES for calculating exact width.
-     *
-     * @var array
-     */
-    private static $extraFontArray = [];
-
-    public static function setExtraFontArray(array $extraFontArray): void
-    {
-        self::$extraFontArray = $extraFontArray;
-    }
-
-    public static function getExtraFontArray(): array
-    {
-        return self::$extraFontArray;
-    }
-
-    /**
      * AutoSize method.
      *
      * @var string
@@ -358,15 +341,15 @@ class Font
         ?FontStyle $defaultFont = null,
         bool $filterAdjustment = false,
         int $indentAdjustment = 0
-    ): float {
+    ): int {
         // If it is rich text, use plain text
         if ($cellText instanceof RichText) {
             $cellText = $cellText->getPlainText();
         }
 
         // Special case if there are one or more newline characters ("\n")
-        $cellText = (string) $cellText;
-        if (strpos($cellText, "\n") !== false) {
+        $cellText = $cellText ?? '';
+        if (strpos(/** @scrutinizer ignore-type */ $cellText, "\n") !== false) {
             $lineTexts = explode("\n", $cellText);
             $lineWidths = [];
             foreach ($lineTexts as $lineText) {
@@ -412,14 +395,18 @@ class Font
         $columnWidth = Drawing::pixelsToCellDimension((int) $columnWidth, $defaultFont ?? new FontStyle());
 
         // Return
-        return round($columnWidth, 4);
+        return (int) round($columnWidth, 6);
     }
 
     /**
      * Get GD text width in pixels for a string of text in a certain font at a certain rotation angle.
      */
-    public static function getTextWidthPixelsExact(string $text, FontStyle $font, int $rotation = 0): float
+    public static function getTextWidthPixelsExact(string $text, FontStyle $font, int $rotation = 0): int
     {
+        if (!function_exists('imagettfbbox')) {
+            throw new PhpSpreadsheetException('GD library needs to be enabled');
+        }
+
         // font size should really be supplied in pixels in GD2,
         // but since GD2 seems to assume 72dpi, pixels and points are the same
         $fontFile = self::getTrueTypeFontFileFromFont($font);
@@ -437,7 +424,7 @@ class Font
         $upperLeftCornerX = $textBox[6];
 
         // Consider the rotation when calculating the width
-        return round(max($lowerRightCornerX - $upperLeftCornerX, $upperRightCornerX - $lowerLeftCornerX), 4);
+        return max($lowerRightCornerX - $upperLeftCornerX, $upperRightCornerX - $lowerLeftCornerX);
     }
 
     /**
@@ -545,8 +532,7 @@ class Font
         }
 
         $name = $font->getName();
-        $fontArray = array_merge(self::FONT_FILE_NAMES, self::$extraFontArray);
-        if (!isset($fontArray[$name])) {
+        if (!isset(self::FONT_FILE_NAMES[$name])) {
             throw new PhpSpreadsheetException('Unknown font name "' . $name . '". Cannot map to TrueType font file');
         }
         $bold = $font->getBold();
@@ -558,7 +544,7 @@ class Font
         if ($italic) {
             $index .= 'i';
         }
-        $fontFile = $fontArray[$name][$index];
+        $fontFile = self::FONT_FILE_NAMES[$name][$index];
 
         $separator = '';
         if (mb_strlen(self::$trueTypeFontPath) > 1 && mb_substr(self::$trueTypeFontPath, -1) !== '/' && mb_substr(self::$trueTypeFontPath, -1) !== '\\') {
@@ -568,31 +554,7 @@ class Font
 
         // Check if file actually exists
         if ($checkPath && !file_exists($fontFile)) {
-            $alternateName = $name;
-            if ($index !== 'x' && $fontArray[$name][$index] !== $fontArray[$name]['x']) {
-                // Bold but no italic:
-                //   Comic Sans
-                //   Tahoma
-                // Neither bold nor italic:
-                //   Impact
-                //   Lucida Console
-                //   Lucida Sans Unicode
-                //   Microsoft Sans Serif
-                //   Symbol
-                if ($index === 'xb') {
-                    $alternateName .= ' Bold';
-                } elseif ($index === 'xi') {
-                    $alternateName .= ' Italic';
-                } elseif ($fontArray[$name]['xb'] === $fontArray[$name]['xbi']) {
-                    $alternateName .= ' Bold';
-                } else {
-                    $alternateName .= ' Bold Italic';
-                }
-            }
-            $fontFile = self::$trueTypeFontPath . $separator . $alternateName . '.ttf';
-            if (!file_exists($fontFile)) {
-                throw new PhpSpreadsheetException('TrueType Font file not found');
-            }
+            throw new PhpSpreadsheetException('TrueType Font file not found');
         }
 
         return $fontFile;

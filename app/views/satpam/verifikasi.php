@@ -55,11 +55,17 @@ include __DIR__ . '/../layouts/header.php';
                                                 <td>
                                                     <?php
                                                         $status = htmlspecialchars($izin['status']);
-                                                        $badgeClass = match ($status) {
-                                                            'Disetujui' => 'badge bg-success',
-                                                            'Ditolak'   => 'badge bg-danger',
-                                                            default     => 'badge bg-warning text-dark',
-                                                        };
+                                                        switch ($status) {
+                                                            case 'Disetujui':
+                                                                $badgeClass = 'badge bg-success';
+                                                                break;
+                                                            case 'Ditolak':
+                                                                $badgeClass = 'badge bg-danger';
+                                                                break;
+                                                            default:
+                                                                $badgeClass = 'badge bg-warning text-dark';
+                                                                break;
+                                                        }
                                                     ?>
                                                     <span class="<?= $badgeClass; ?>"><?= $status; ?></span>
                                                 </td>

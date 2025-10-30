@@ -1,5 +1,8 @@
 <?php
+require_once __DIR__ . '/../../vendor/autoload.php';
 require_once __DIR__ . "/../models/User.php";
+
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class UserController
 {
@@ -18,7 +21,10 @@ class UserController
     public function authenticate()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            session_start();
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
+
             $nip = trim($_POST['nip']);
             $password = $_POST['password'];
 
@@ -49,6 +55,8 @@ class UserController
                 $sekarang = new DateTime();
                 $diff = $mulai_kerja->diff($sekarang);
 
+                $_SESSION['success'] = "Login berhasil!";
+
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['nama'] = $user['nama'];
                 $_SESSION['jabatan'] = $user['kode_jabatan'];
@@ -65,11 +73,12 @@ class UserController
         }
     }
 
-    private function failed() {
-        echo "<script>alert('Login gagal! Periksa nip dan password.'); window.location.href='login';</script>";
+    private function failed()
+    {
+        $_SESSION['error'] = "Login gagal! Periksa NIP dan Password Anda.";
+        header("Location: login");
         exit();
     }
-
 
     public function userInfo() {
         $user = $this->user->getUserById($_SESSION['user_id']);
@@ -214,5 +223,136 @@ class UserController
         header("Location: daftar_pegawai");
         exit;
     }
+
+    public function import_user_excel()
+    {
+        ini_set('display_errors', 0);
+        error_reporting(E_ALL);
+
+        header('Content-Type: application/json; charset=utf-8');
+
+        if (!isset($_FILES['file_excel']) || $_FILES['file_excel']['error'] !== UPLOAD_ERR_OK) {
+            echo json_encode([
+                'success' => false,
+                'message' => "Gagal upload file! Pastikan file yang diupload benar."
+            ]);
+            exit;
+        }
+
+        $fileTmp  = $_FILES['file_excel']['tmp_name'];
+        $fileName = $_FILES['file_excel']['name'];
+        $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+
+        if (!in_array($ext, ['xls', 'xlsx'])) {
+            echo json_encode([
+                'success' => false,
+                'message' => "Format file tidak didukung! Hanya file Excel (.xls, .xlsx) yang diperbolehkan."
+            ]);
+            exit;
+        }
+
+        try {
+            $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReaderForFile($fileTmp);
+            $spreadsheet = $reader->load($fileTmp);
+            $sheet = $spreadsheet->getActiveSheet();
+            $rows = $sheet->toArray();
+
+            $successCount = 0;
+            $errorCount = 0;
+            $errors = [];
+
+            // --- pisahkan data per prioritas jabatan ---
+            $bucket = [
+                'KEP' => [],
+                'KTA' => [],
+                'STF' => [],
+                'OTHER' => []
+            ];
+
+            foreach ($rows as $index => $row) {
+                if ($index == 0) continue; // skip header
+
+                $data = [
+                    'nama'                => trim($row[0]),
+                    'birth_of_date'       => trim($row[1]),
+                    'place_of_birth'      => trim($row[2]),
+                    'nip'                 => trim($row[3]),
+                    'email'               => trim($row[4]),
+                    'phone_number'        => trim($row[5]),
+                    'address'             => trim($row[6]),
+                    'jabatan_kode'        => trim($row[7]),
+                    'divisi_kode'         => trim($row[8]),
+                    'kepala_nip'          => trim($row[9]),
+                    'atasan_nip'          => trim($row[10]),
+                    'tanggal_mulai_kerja' => trim($row[11]),
+                    '_row_index'          => $index
+                ];
+
+                // kelompokkan sesuai prioritas
+                if ($data['jabatan_kode'] === 'KEP') {
+                    $bucket['KEP'][] = $data;
+                } elseif ($data['jabatan_kode'] === 'KTA') {
+                    $bucket['KTA'][] = $data;
+                } elseif ($data['jabatan_kode'] === 'STF') {
+                    $bucket['STF'][] = $data;
+                } else {
+                    $bucket['OTHER'][] = $data;
+                }
+            }
+
+            // --- urutan eksekusi sesuai prioritas ---
+            $orderedData = array_merge(
+                $bucket['KEP'],
+                $bucket['KTA'],
+                $bucket['STF'],
+                $bucket['OTHER']
+            );
+
+            // --- proses insert/update sesuai urutan ---
+            foreach ($orderedData as $data) {
+                $index = $data['_row_index'];
+
+                if (empty($data['nip']) || empty($data['nama'])) {
+                    $errorCount++;
+                    $errors[] = "Baris $index: NIP atau Nama kosong";
+                    continue;
+                }
+
+                if ($this->user->insertFromExcel($data)) {
+                    $successCount++;
+                } else {
+                    $errorCount++;
+                    $errors[] = "Baris $index: Gagal menyimpan data ke database";
+                }
+            }
+
+            if ($successCount > 0) {
+                $message = "Import selesai! $successCount data berhasil diproses.";
+                if ($errorCount > 0) {
+                    $message .= " $errorCount data gagal diproses.";
+                }
+            } else {
+                $message = "Tidak ada data yang berhasil diproses. $errorCount data gagal.";
+            }
+
+            echo json_encode([
+                'success' => $successCount > 0,
+                'message' => $message,
+                'stats'   => [
+                    'success' => $successCount,
+                    'error'   => $errorCount
+                ],
+                'errors'  => $errors
+            ]);
+
+        } catch (Exception $e) {
+            echo json_encode([
+                'success' => false,
+                'message' => "Terjadi kesalahan: " . $e->getMessage()
+            ]);
+        }
+        exit;
+    }
+
 
 }

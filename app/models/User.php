@@ -258,6 +258,16 @@ class User {
             // Hash password default di PHP, bukan di SQL
             $hashedPassword = password_hash("123456", PASSWORD_BCRYPT);
 
+            $kode_jabatan = "SELECT kode FROM jabatan WHERE id = :jabatan_id LIMIT 1";
+            $stmtKode = $this->conn->prepare($kode_jabatan);
+            $stmtKode->bindParam(':jabatan_id', $jenisJabatan, PDO::PARAM_INT);
+            $stmtKode->execute();
+            $result = $stmtKode->fetch(PDO::FETCH_ASSOC);
+
+            if (isset($result['kode']) && $result['kode'] === 'KTA') {
+                $ketua_timker = $kepala_balai;
+            }
+
             $query = "INSERT INTO users (
                         nama, 
                         birth_of_date, 
@@ -302,7 +312,7 @@ class User {
                 ':email' => $email,
                 ':phone_number' => $phone_number,
                 ':alamat' => $alamat,
-                ':password' => $hashedPassword, // password sudah di-hash
+                ':password' => $hashedPassword, 
                 ':jabatan_id' => $jenisJabatan,
                 ':kepala_id' => !empty($kepala_balai) ? $kepala_balai : null,
                 ':atasan_id' => !empty($ketua_timker) ? $ketua_timker : null,
@@ -438,8 +448,123 @@ class User {
             error_log("Gagal nonaktifkan user: " . $e->getMessage());
             return false;
         }
-}
+    }
+
+    private function getIdByKode($table, $kode)
+    {
+        $stmt = $this->conn->prepare("SELECT id FROM {$table} WHERE kode = ? LIMIT 1");
+        $stmt->execute([$kode]);
+        return $stmt->fetchColumn();
+    }
+
+    public function getUserIdByNip($nip)
+    {
+        $stmt = $this->conn->prepare("SELECT id FROM users WHERE nip = ? AND IsActive = 1");
+        $stmt->execute([$nip]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ? $row['id'] : null;
+    }
 
 
+    public function isNipExists($nip)
+    {
+        $sql = "SELECT id FROM users WHERE nip = ? LIMIT 1";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute(array($nip));
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ? true : false;
+    }
+
+    // Tetap dipakai untuk insert satu user
+    public function insertFromExcel($data)
+    {
+        // Cari id jabatan & divisi
+        $jabatan_id = !empty($data['jabatan_kode']) 
+            ? $this->getIdByKode("jabatan", $data['jabatan_kode']) 
+            : null;
+
+        $divisi_id  = !empty($data['divisi_kode']) 
+            ? $this->getIdByKode("divisitim", $data['divisi_kode']) 
+            : null;
+
+        // Cari id kepala & atasan dari nip
+        $kepala_id = !empty($data['kepala_nip']) 
+            ? $this->getUserIdByNip($data['kepala_nip']) 
+            : null;
+
+        $atasan_id = !empty($data['atasan_nip']) 
+            ? $this->getUserIdByNip($data['atasan_nip']) 
+            : null;
+
+        // Password default (hanya dipakai kalau user baru)
+        $password = password_hash("123456", PASSWORD_BCRYPT);
+
+        // Normalisasi email (kalau kosong/null → set null)
+        $email = !empty($data['email']) ? $data['email'] : null;
+
+        // Cek apakah NIP sudah ada
+        $check = $this->conn->prepare("SELECT id FROM users WHERE nip = ? AND IsActive = 1");
+        $check->execute([$data['nip']]);
+        $existing = $check->fetch(PDO::FETCH_ASSOC);
+
+        if ($existing) {
+            // UPDATE jika sudah ada
+            $sql = "UPDATE users SET
+                nama = ?,
+                birth_of_date = ?,
+                place_of_birth = ?,
+                email = ?,
+                phone_number = ?,
+                address = ?,
+                jabatan_id = ?,
+                kepala_id = ?,
+                atasan_id = ?,
+                divisi_id = ?,
+                tanggal_mulai_kerja = ?,
+                isActive = 1
+                WHERE nip = ?";
+
+            $stmt = $this->conn->prepare($sql);
+            return $stmt->execute([
+                $data['nama'] ?? null,
+                $data['birth_of_date'] ?? null,
+                $data['place_of_birth'] ?? null,
+                $email, 
+                $data['phone_number'] ?? null,
+                $data['address'] ?? null,
+                $jabatan_id ?: null,
+                $kepala_id ?: null,
+                $atasan_id ?: null,
+                $divisi_id ?: null,
+                $data['tanggal_mulai_kerja'] ?? null,
+                $data['nip']
+            ]);
+        } else {
+            // INSERT jika belum ada
+            $sql = "INSERT INTO users
+                (nama, birth_of_date, place_of_birth, nip, email, phone_number, address,
+                password, jabatan_id, kepala_id, atasan_id, divisi_id, tanggal_mulai_kerja, isActive)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+            $stmt = $this->conn->prepare($sql);
+            return $stmt->execute([
+                $data['nama'] ?? null,
+                $data['birth_of_date'] ?? null,
+                $data['place_of_birth'] ?? null,
+                $data['nip'] ?? null,
+                $email, 
+                $data['phone_number'] ?? null,
+                $data['address'] ?? null,
+                $password,
+                $jabatan_id ?: null,
+                $kepala_id ?: null,
+                $atasan_id ?: null,
+                $divisi_id ?: null,
+                $data['tanggal_mulai_kerja'] ?? null,
+                1
+            ]);
+        }
+    }
 }
 ?>

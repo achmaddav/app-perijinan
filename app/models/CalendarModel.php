@@ -6,31 +6,27 @@ class CalendarModel {
         $this->conn = $db;
     }
 
-    public function generateCalendar($startYear, $endYear) {
-        // Buat tanggal dari startYear sampai endYear
-        $startDate = "$startYear-01-01";
-        $endDate   = "$endYear-12-31";
+    public function generateCalendar($startYear, $endYear)
+    {
+        $startDate = strtotime("$startYear-01-01");
+        $endDate   = strtotime("$endYear-12-31");
 
-        $query = "
-            INSERT IGNORE INTO calendar (tanggal, is_weekend, is_dayoff)
-            SELECT d,
-                   CASE WHEN DAYOFWEEK(d) IN (1,7) THEN 1 ELSE 0 END,
-                   0
-            FROM (
-                WITH RECURSIVE dates(d) AS (
-                    SELECT DATE(:startDate)
-                    UNION ALL
-                    SELECT DATE_ADD(d, INTERVAL 1 DAY) FROM dates WHERE d < :endDate
-                )
-                SELECT d FROM dates
-            ) AS x;
-        ";
+        $sql = "INSERT IGNORE INTO calendar (tanggal, is_weekend, is_dayoff) VALUES (?, ?, ?)";
+        $stmt = $this->conn->prepare($sql);
 
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindValue(':startDate', $startDate);
-        $stmt->bindValue(':endDate', $endDate);
-        return $stmt->execute();
+        while ($startDate <= $endDate) {
+            $tanggal = date("Y-m-d", $startDate);
+            $dayOfWeek = date("N", $startDate); // 1 = Senin, 7 = Minggu
+            $isWeekend = ($dayOfWeek == 6 || $dayOfWeek == 7) ? 1 : 0;
+
+            $stmt->execute([$tanggal, $isWeekend, 0]);
+
+            $startDate = strtotime("+1 day", $startDate);
+        }
+
+        return true;
     }
+
 
     public function getCalendar($year) {
         $stmt = $this->conn->prepare("SELECT * FROM calendar WHERE YEAR(tanggal) = :year ORDER BY tanggal");

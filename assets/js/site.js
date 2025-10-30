@@ -2,7 +2,7 @@ function submitFormPDF(id) {
   const formData = new FormData(); // ✅ kosong, lalu append manual
   formData.append("id", id);
 
-  fetch("?page=cetak_cuti", {
+  fetch("/app-perijinan/cetak_cuti", {
     method: "POST",
     body: formData,
   })
@@ -76,15 +76,6 @@ $(document).ready(function () {
     });
 });
 
-document.addEventListener("DOMContentLoaded", function () {
-  var tooltipTriggerList = [].slice.call(
-    document.querySelectorAll('[data-bs-toggle="tooltip"]')
-  );
-  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-    return new bootstrap.Tooltip(tooltipTriggerEl);
-  });
-});
-
 // <!-- Function: Show Cannot Delete Alert -->
 
 function showCannotDeleteAlert(status) {
@@ -100,6 +91,13 @@ function showCannotDeleteAlert(status) {
 // <!-- Modal Konfirmasi Setup -->
 
 document.addEventListener("DOMContentLoaded", function () {
+  var tooltipTriggerList = [].slice.call(
+    document.querySelectorAll('[data-bs-toggle="tooltip"]')
+  );
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl);
+  });
+
   let modalKonfirmasi = document.getElementById("modalKonfirmasi");
   if (modalKonfirmasi) {
     modalKonfirmasi.addEventListener("show.bs.modal", function (event) {
@@ -196,3 +194,4 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // <!-- Dynamic Footer Year -->
 document.getElementById("currentYear").textContent = new Date().getFullYear();
+

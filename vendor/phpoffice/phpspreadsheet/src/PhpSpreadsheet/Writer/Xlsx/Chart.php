@@ -12,7 +12,6 @@ use PhpOffice\PhpSpreadsheet\Chart\PlotArea;
 use PhpOffice\PhpSpreadsheet\Chart\Properties;
 use PhpOffice\PhpSpreadsheet\Chart\Title;
 use PhpOffice\PhpSpreadsheet\Chart\TrendLine;
-use PhpOffice\PhpSpreadsheet\Reader\Xlsx\Namespaces;
 use PhpOffice\PhpSpreadsheet\Shared\XMLWriter;
 use PhpOffice\PhpSpreadsheet\Writer\Exception as WriterException;
 
@@ -49,9 +48,9 @@ class Chart extends WriterPart
 
         // c:chartSpace
         $objWriter->startElement('c:chartSpace');
-        $objWriter->writeAttribute('xmlns:c', Namespaces::CHART);
-        $objWriter->writeAttribute('xmlns:a', Namespaces::DRAWINGML);
-        $objWriter->writeAttribute('xmlns:r', Namespaces::SCHEMA_OFFICE_DOCUMENT);
+        $objWriter->writeAttribute('xmlns:c', 'http://schemas.openxmlformats.org/drawingml/2006/chart');
+        $objWriter->writeAttribute('xmlns:a', 'http://schemas.openxmlformats.org/drawingml/2006/main');
+        $objWriter->writeAttribute('xmlns:r', 'http://schemas.openxmlformats.org/officeDocument/2006/relationships');
 
         $objWriter->startElement('c:date1904');
         $objWriter->writeAttribute('val', '0');
@@ -174,7 +173,7 @@ class Chart extends WriterPart
         $this->writeLayout($objWriter, $title->getLayout());
 
         $objWriter->startElement('c:overlay');
-        $objWriter->writeAttribute('val', ($title->getOverlay()) ? '1' : '0');
+        $objWriter->writeAttribute('val', '0');
         $objWriter->endElement();
 
         $objWriter->endElement();
@@ -626,7 +625,6 @@ class Chart extends WriterPart
 
         $objWriter->startElement('c:spPr');
         $this->writeColor($objWriter, $yAxis->getFillColorObject());
-        $this->writeLineStyles($objWriter, $yAxis);
         $this->writeEffects($objWriter, $yAxis);
         $objWriter->endElement(); // spPr
 
@@ -1041,12 +1039,11 @@ class Chart extends WriterPart
             $objWriter->startElement('c:ser');
 
             $objWriter->startElement('c:idx');
-            $adder = array_key_exists(0, $plotSeriesOrder) ? $this->seriesIndex : 0;
-            $objWriter->writeAttribute('val', (string) ($adder + $plotSeriesIdx));
+            $objWriter->writeAttribute('val', (string) ($this->seriesIndex + $plotSeriesIdx));
             $objWriter->endElement();
 
             $objWriter->startElement('c:order');
-            $objWriter->writeAttribute('val', (string) ($adder + $plotSeriesRef));
+            $objWriter->writeAttribute('val', (string) ($this->seriesIndex + $plotSeriesRef));
             $objWriter->endElement();
 
             $plotLabel = $plotGroup->getPlotLabelByIndex($plotSeriesIdx);
@@ -1415,14 +1412,16 @@ class Chart extends WriterPart
 
                 $dataValues = $plotSeriesValues->getDataValues();
                 if (!empty($dataValues)) {
-                    foreach ($dataValues as $plotSeriesKey => $plotSeriesValue) {
-                        $objWriter->startElement('c:pt');
-                        $objWriter->writeAttribute('idx', $plotSeriesKey);
+                    if (is_array($dataValues)) {
+                        foreach ($dataValues as $plotSeriesKey => $plotSeriesValue) {
+                            $objWriter->startElement('c:pt');
+                            $objWriter->writeAttribute('idx', $plotSeriesKey);
 
-                        $objWriter->startElement('c:v');
-                        $objWriter->writeRawData($plotSeriesValue);
-                        $objWriter->endElement();
-                        $objWriter->endElement();
+                            $objWriter->startElement('c:v');
+                            $objWriter->writeRawData($plotSeriesValue);
+                            $objWriter->endElement();
+                            $objWriter->endElement();
+                        }
                     }
                 }
 
@@ -1463,13 +1462,15 @@ class Chart extends WriterPart
 
         $dataValues = $plotSeriesValues->getDataValues();
         if (!empty($dataValues)) {
-            foreach ($dataValues as $plotSeriesKey => $plotSeriesValue) {
-                $objWriter->startElement('c:pt');
-                $objWriter->writeAttribute('idx', $plotSeriesKey);
-                $objWriter->startElement('c:v');
-                $objWriter->writeRawData('1');
-                $objWriter->endElement();
-                $objWriter->endElement();
+            if (is_array($dataValues)) {
+                foreach ($dataValues as $plotSeriesKey => $plotSeriesValue) {
+                    $objWriter->startElement('c:pt');
+                    $objWriter->writeAttribute('idx', $plotSeriesKey);
+                    $objWriter->startElement('c:v');
+                    $objWriter->writeRawData('1');
+                    $objWriter->endElement();
+                    $objWriter->endElement();
+                }
             }
         }
 
@@ -1552,11 +1553,11 @@ class Chart extends WriterPart
     private function writeAlternateContent(XMLWriter $objWriter): void
     {
         $objWriter->startElement('mc:AlternateContent');
-        $objWriter->writeAttribute('xmlns:mc', Namespaces::COMPATIBILITY);
+        $objWriter->writeAttribute('xmlns:mc', 'http://schemas.openxmlformats.org/markup-compatibility/2006');
 
         $objWriter->startElement('mc:Choice');
         $objWriter->writeAttribute('Requires', 'c14');
-        $objWriter->writeAttribute('xmlns:c14', Namespaces::CHART_ALTERNATE);
+        $objWriter->writeAttribute('xmlns:c14', 'http://schemas.microsoft.com/office/drawing/2007/8/2/chart');
 
         $objWriter->startElement('c14:style');
         $objWriter->writeAttribute('val', '102');
